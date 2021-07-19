@@ -1,0 +1,33 @@
+From c9cf865d2e5f4ea4952d0ea6d4e0e2e2120649b7 Mon Sep 17 00:00:00 2001
+From: Isaac Jurado <diptongo@gmail.com>
+Date: Wed, 19 May 2021 09:50:53 +0200
+Subject: [PATCH] Allow passing STATIC_* setup variables from the environment.
+ (GH-314)
+
+For very customized static builds of lxml, the only way to succeed is by patching the setup.py file.  This change makes it a little more convenient to make static builds directly from the pip command line.
+---
+ setup.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 845c0d9c0..cba548095 100644
+--- a/setup.py
++++ b/setup.py
+@@ -25,10 +25,13 @@
+ # override these and pass --static for a static build. See
+ # doc/build.txt for more information. If you do not pass --static
+ # changing this will have no effect.
+-STATIC_INCLUDE_DIRS = []
+-STATIC_LIBRARY_DIRS = []
+-STATIC_CFLAGS = []
+-STATIC_BINARIES = []
++def static_env_list(name, separator=None):
++    return [x.strip() for x in os.environ.get(name, "").split(separator) if x.strip()]
++
++STATIC_INCLUDE_DIRS = static_env_list("LXML_STATIC_INCLUDE_DIRS", separator=os.pathsep)
++STATIC_LIBRARY_DIRS = static_env_list("LXML_STATIC_LIBRARY_DIRS", separator=os.pathsep)
++STATIC_CFLAGS = static_env_list("LXML_STATIC_CFLAGS")
++STATIC_BINARIES = static_env_list("LXML_STATIC_BINARIES", separator=os.pathsep)
+
+ # create lxml-version.h file
+ versioninfo.create_version_h()

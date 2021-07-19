@@ -1,0 +1,22 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "4.*"
+      },
+      "build_tools": [
+        "patch"
+      ],
+      "dependencies": [
+        "libxml2",
+        "libxslt",
+        "zlib"
+      ],
+      "files": [
+        "c9cf865d2e5f4ea4952d0ea6d4e0e2e2120649b7.patch",
+        "build.py"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}
