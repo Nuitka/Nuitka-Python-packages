@@ -2,7 +2,7 @@
   "scripts": [
     {
       "metadata": {
-        "Version": "4.*"
+        "Version": "4.6.[0-3]"
       },
       "build_tools": [
         "patch"
@@ -13,7 +13,21 @@
         "zlib"
       ],
       "files": [
-        "c9cf865d2e5f4ea4952d0ea6d4e0e2e2120649b7.patch",
+        "pre-4.6.4/c9cf865d2e5f4ea4952d0ea6d4e0e2e2120649b7.patch",
+        "pre-4.6.4/build.py"
+      ],
+      "build_script": "pre-4.6.4/build.py"
+    },	
+    {
+      "metadata": {
+        "Version": "4.*"
+      },
+      "dependencies": [
+        "libxml2",
+        "libxslt",
+        "zlib"
+      ],
+      "files": [
         "build.py"
       ],
       "build_script": "build.py"

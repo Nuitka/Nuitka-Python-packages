@@ -22,6 +22,8 @@ def run(req: InstallRequirement,
 
     os.chdir(source_dir)
 
+    __np__.run_build_tool_exe("patch", "patch.exe", "--binary", "setup.py", os.path.join(os.path.dirname(__file__), "c9cf865d2e5f4ea4952d0ea6d4e0e2e2120649b7.patch"))
+
     os.environ["LXML_STATIC_INCLUDE_DIRS"] = os.pathsep.join([
         __np__.find_dep_include("iconv"),
         __np__.find_dep_include("libxml2"),
