@@ -1,0 +1,14 @@
+{
+  "version": "2.11.0",
+  "build_tools": [
+    "cmake",
+    "ninja"
+  ],
+  "dependencies": [
+    "zlib"
+  ],
+  "files": [
+    "build.py"
+  ],
+  "build_script": "build.py"
+}
