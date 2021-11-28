@@ -12,16 +12,13 @@ def run(temp_dir: str):
     __np__.setup_compiler_env()
 
     src_dir = glob.glob(os.path.join(temp_dir, "harfbuzz*"))[0]
-
-    build_dir = os.path.join(temp_dir, "build")
-    os.mkdir(build_dir)
     os.chdir(src_dir)
 
     os.environ["CFLAGS"] = "/MT"
     os.environ["CXXFLAGS"] = "/MT"
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("meson", "meson.exe", "--buildtype=plain", "--default-library=static", "build")
-    __np__.run_build_tool_exe("ninja", "ninja.exe", "-Cbuild", "-v")
+    __np__.run_build_tool_exe("ninja", "ninja.exe", "-Cbuild")
 
     os.rename(os.path.join(src_dir, "build", "src", "libharfbuzz.a"), os.path.join(src_dir, "build", "src", "harfbuzz.lib"))
     os.rename(os.path.join(src_dir, "build", "src", "libharfbuzz-subset.a"), os.path.join(src_dir, "build", "src", "harfbuzz-subset.lib"))
