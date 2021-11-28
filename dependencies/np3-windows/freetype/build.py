@@ -13,13 +13,16 @@ def run(temp_dir: str):
 
     src_dir = glob.glob(os.path.join(temp_dir, "freetype*"))[0]
 
+    __np__.auto_patch_MD_MT(src_dir)
+
     build_dir = os.path.join(temp_dir, "build")
     os.mkdir(build_dir)
     os.chdir(build_dir)
 
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
-                              "-DCMAKE_BUILD_TYPE=Release", src_dir)
+                              "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded",
+                              src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
 
     __np__.install_dep_libs("freetype", os.path.join(build_dir, "freetype.lib"))
