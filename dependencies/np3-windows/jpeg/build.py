@@ -25,8 +25,7 @@ def run(temp_dir: str):
     os.chdir(build_dir)
 
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
-                              "-DCMAKE_BUILD_TYPE=Release",
-                              "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded", src_dir)
+                              "-DCMAKE_BUILD_TYPE=Release", src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
 
     shutil.copy(os.path.join(build_dir, "jpeg-static.lib"), os.path.join(build_dir, "jpeg.lib"))

@@ -21,7 +21,7 @@ def run(temp_dir: str):
 
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
-                              "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded",
+                              "-DCMAKE_BUILD_TYPE=Release",
                               "-DBUILD_SHARED_LIBS=OFF", "-DODE_WITH_DEMOS=OFF", "-DODE_WITH_TESTS=OFF",
                               "-DODE_DOUBLE_PRECISION=ON", src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
@@ -29,7 +29,7 @@ def run(temp_dir: str):
     os.remove(os.path.join(build_dir, "CMakeCache.txt"))
 
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
-                              "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded",
+                              "-DCMAKE_BUILD_TYPE=Release",
                               "-DBUILD_SHARED_LIBS=OFF", "-DODE_WITH_DEMOS=OFF", "-DODE_WITH_TESTS=OFF",
                               "-DODE_DOUBLE_PRECISION=OFF", src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")

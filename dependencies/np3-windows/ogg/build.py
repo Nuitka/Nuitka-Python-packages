@@ -21,8 +21,7 @@ def run(temp_dir: str):
 
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
-                              "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded",
-                              src_dir)
+                              "-DCMAKE_BUILD_TYPE=Release", src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
 
     __np__.install_dep_libs("ogg", os.path.join(build_dir, "ogg.lib"))
