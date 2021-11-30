@@ -7,13 +7,11 @@ import glob
 
 
 def run(temp_dir: str):
-    __np__.download_extract("https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.zip", temp_dir)
+    __np__.download_extract("https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.zip", temp_dir)
 
     __np__.setup_compiler_env()
 
-    src_dir = glob.glob(os.path.join(temp_dir, "opusfile*"))[0]
-
-    shutil.copy(os.path.join(temp_dir, "libopusfile.cmake"), os.path.join(src_dir, "CMakeLists.txt"))
+    src_dir = glob.glob(os.path.join(temp_dir, "libvorbis*"))[0]
 
     __np__.auto_patch_MD_MT(src_dir)
 
@@ -25,9 +23,8 @@ def run(temp_dir: str):
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
                               "-DCMAKE_BUILD_TYPE=Release",
                               "-DOGG_ROOT=" + __np__.find_dep_root("ogg"),
-                              "-DOPUS_ROOT=" + __np__.find_dep_root("opus"),
                               src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
 
-    __np__.install_dep_libs("opusfile", os.path.join(build_dir, "opusfile.lib"))
-    __np__.install_dep_include("opusfile", os.path.join(src_dir, "include", "*.h"))
+    __np__.install_dep_libs("vorbis", os.path.join(build_dir, "lib", "*.lib"))
+    __np__.install_dep_include("vorbis", os.path.join(src_dir, "include", "vorbis"))
