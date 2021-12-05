@@ -17,13 +17,18 @@ def run(temp_dir: str):
     os.mkdir(build_dir)
     os.chdir(build_dir)
 
+    install_dir = os.path.join(temp_dir, "install")
+    os.mkdir(install_dir)
+
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
                               "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_CPU_DEMOS=OFF",
                               "-DBUILD_OPENGL3_DEMOS=OFF", "-DBUILD_UNIT_TESTS=OFF",
+                              "-DINSTALL_LIBS=ON",
+                              "-DCMAKE_INSTALL_PREFIX=" + install_dir,
                               src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
+    __np__.run_build_tool_exe("ninja", "ninja.exe", "install")
 
-    __np__.install_dep_libs("bullet", os.path.join(build_dir, "lib", "*.lib"))
-    __np__.install_dep_include("bullet", os.path.join(src_dir, "src", "**", "*.h"), base_dir=os.path.join(src_dir, "src"))
-    __np__.install_dep_include("bullet", os.path.join(src_dir, "src", "*.h"), base_dir=os.path.join(src_dir, "src"))
+    __np__.install_dep_libs("bullet", os.path.join(install_dir, "lib", "*.lib"))
+    __np__.install_dep_include("bullet", os.path.join(install_dir, "include", "bullet", "*"))

@@ -5,6 +5,7 @@
     "ninja"
   ],
   "dependencies": [
+    "harfbuzz",
     "zlib"
   ],
   "files": [

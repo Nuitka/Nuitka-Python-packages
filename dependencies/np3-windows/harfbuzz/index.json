@@ -4,6 +4,9 @@
     "meson",
     "ninja"
   ],
+  "dependencies": [
+    "zlib"
+  ],
   "files": [
     "build.py"
   ],
