@@ -1,0 +1,13 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "1.*"
+      },
+      "files": [
+        "build.py"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}
