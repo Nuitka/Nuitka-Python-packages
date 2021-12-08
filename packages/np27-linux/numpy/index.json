@@ -7,7 +7,8 @@
       "files": [
         "build.py"
       ],
-      "build_script": "build.py"
+      "build_script": "build.py",
+      "static_pattern": "*"
     }
   ]
 }
