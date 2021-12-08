@@ -5,7 +5,8 @@
         "Version": "1.*"
       },
       "files": [
-        "build.py"
+        "build.py",
+        "numpy-static-patch.patch"
       ],
       "build_script": "build.py",
       "static_pattern": "*"
