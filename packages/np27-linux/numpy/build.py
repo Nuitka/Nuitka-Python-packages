@@ -22,6 +22,8 @@ def run(req,
 
     os.chdir(source_dir)
 
-    __np__.run_build_tool_exe("patch", "patch", "numpy-static-patch.patch")
+    __np__.my_print("Starting numpy patching...")
+    __np__.apply_patch(os.path.join(temp_dir, "numpy-static-patch.patch"), ".")
 
+    __np__.my_print("Starting numpy compilation...")
     __np__.run_with_output("python", os.path.join(source_dir, "setup.py"), "install")
