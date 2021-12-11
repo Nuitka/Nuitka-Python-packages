@@ -1,40 +1,53 @@
-Index: numpy/distutils/command/install_clib.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/numpy/distutils/command/install_clib.py b/numpy/distutils/command/install_clib.py
---- a/numpy/distutils/command/install_clib.py    (revision 3dec7099ce38cb189880f6f69df318f35ff9a5ea)
-+++ b/numpy/distutils/command/install_clib.py    (date 1638937643652)
-@@ -34,6 +34,8 @@
-             source = os.path.join(build_dir, name)
-             self.mkpath(target_dir)
-             self.outfiles.append(self.copy_file(source, target_dir)[0])
-+            if os.path.exists(source + '.link.json'):
-+                self.outfiles.append(self.copy_file(source + '.link.json', target_dir)[0])
+From 53f82f1c0d13c81fd498fb3aeeb0a95b584bace4 Mon Sep 17 00:00:00 2001
+From: Kay Hayen <kay.hayen@gmail.com>
+Date: Sat, 11 Dec 2021 12:11:04 +0100
+Subject: [PATCH] Nuitka-Python changes to allow static linking.
 
-     def get_outputs(self):
-         return self.outfiles
-Index: numpy/distutils/command/build_ext.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
+---
+ numpy/core/setup.py                     | 12 ++++++--
+ numpy/distutils/command/build_ext.py    | 37 +++++++++++++++++++------
+ numpy/distutils/command/install_clib.py |  2 ++
+ 3 files changed, 39 insertions(+), 12 deletions(-)
+
+diff --git a/numpy/core/setup.py b/numpy/core/setup.py
+index 00a9ffe..8544240 100644
+--- a/numpy/core/setup.py
++++ b/numpy/core/setup.py
+@@ -707,9 +707,15 @@ def configuration(parent_package='',top_path=None):
+                        join('src', 'common', 'npy_binsearch.h.src'),
+                        join('src', 'npysort', 'binsearch.c.src'),
+                        ]
+-    config.add_library('npysort',
+-                       sources=npysort_sources,
+-                       include_dirs=[])
++
++    # Nuitka-Python: Disable whole program optimization for Windows.
++    config.add_installed_library('npysort',
++                                 sources=npysort_sources,
++                                 install_dir='lib',
++                                 build_info={
++                                     'include_dirs': [],  # empty list required for creating npy_math_internal.h
++                                     'extra_compiler_args': (['/GL-'] if is_msvc else []),
++                                 })
+ 
+     #######################################################################
+     #                     multiarray_tests module                         #
 diff --git a/numpy/distutils/command/build_ext.py b/numpy/distutils/command/build_ext.py
---- a/numpy/distutils/command/build_ext.py    (revision 3dec7099ce38cb189880f6f69df318f35ff9a5ea)
-+++ b/numpy/distutils/command/build_ext.py    (date 1638939198440)
-@@ -5,6 +5,7 @@
-
+index ab9d585..37cefe8 100644
+--- a/numpy/distutils/command/build_ext.py
++++ b/numpy/distutils/command/build_ext.py
+@@ -5,6 +5,7 @@ from __future__ import division, absolute_import, print_function
+ 
  import os
  import subprocess
-+import json
++from __np__ import write_linker_json, shall_link_statically
  from glob import glob
-
+ 
  from distutils.dep_util import newer_group
-@@ -466,15 +467,20 @@
+@@ -466,15 +467,33 @@ class build_ext (old_build_ext):
                      fcompiler, library_dirs,
                      unlinkable_fobjects)
-
+ 
 -        linker(objects, ext_filename,
 -               libraries=libraries,
 -               library_dirs=library_dirs,
@@ -44,45 +57,49 @@ diff --git a/numpy/distutils/command/build_ext.py b/numpy/distutils/command/buil
 -               debug=self.debug,
 -               build_temp=self.build_temp,
 -               target_lang=ext.language)
-+        ext_filename = ext_filename.replace(".so", "")
++        # Nuitka-Python: Allow both static and dynamic linking.
++        if not shall_link_statically(ext.name):
++            linker(objects, ext_filename,
++                libraries=libraries,
++                library_dirs=library_dirs,
++                runtime_library_dirs=ext.runtime_library_dirs,
++                extra_postargs=extra_args,
++                export_symbols=self.get_export_symbols(ext),
++                debug=self.debug,
++                build_temp=self.build_temp,
++                target_lang=ext.language)
++        else:
++            ext_filename = ext_filename.replace(".so", "")
 +
-+        self.compiler.create_static_lib(
-+            objects, ext_filename, output_dir=os.path.abspath("."), debug=self.debug)
++            self.compiler.create_static_lib(
++                objects, ext_filename, output_dir=os.path.abspath("."), debug=self.debug)
 +
-+        result_path = \
-+            self.compiler.library_filename(ext_filename, output_dir=os.path.abspath("."))
++            result_path = \
++                self.compiler.library_filename(ext_filename, output_dir=os.path.abspath("."))
 +
-+        with open(result_path + '.link.json', 'w') as f:
-+            json.dump({
-+                'libraries': self.get_libraries(ext),
-+                'library_dirs': ext.library_dirs + ['lib'],
-+                'runtime_library_dirs': ext.runtime_library_dirs,
-+                'extra_postargs': extra_args}, f)
-
++            write_linker_json(
++                result_path = result_path,
++                libraries = self.get_libraries(ext),
++                library_dirs = ext.library_dirs + ['lib'],
++                runtime_library_dirs = ext.runtime_library_dirs,
++                extra_args = extra_args
++            )
+ 
      def _add_dummy_mingwex_sym(self, c_sources):
          build_src = self.get_finalized_command("build_src").build_src
-Index: numpy/core/setup.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/numpy/core/setup.py b/numpy/core/setup.py
---- a/numpy/core/setup.py    (revision 3dec7099ce38cb189880f6f69df318f35ff9a5ea)
-+++ b/numpy/core/setup.py    (date 1638943041772)
-@@ -709,9 +709,13 @@
-                        join('src', 'common', 'npy_binsearch.h.src'),
-                        join('src', 'npysort', 'binsearch.c.src'),
-                        ]
--    config.add_library('npysort',
--                       sources=npysort_sources,
--                       include_dirs=[])
-+    config.add_installed_library('npysort',
-+                                 sources=npysort_sources,
-+                                 install_dir='lib',
-+                                 build_info={
-+                                     'include_dirs': [],  # empty list required for creating npy_math_internal.h
-+                                     'extra_compiler_args': (['/GL-'] if is_msvc else []),
-+                                 })
+diff --git a/numpy/distutils/command/install_clib.py b/numpy/distutils/command/install_clib.py
+index 662aa00..eae466c 100644
+--- a/numpy/distutils/command/install_clib.py
++++ b/numpy/distutils/command/install_clib.py
+@@ -34,6 +34,8 @@ class install_clib(Command):
+             source = os.path.join(build_dir, name)
+             self.mkpath(target_dir)
+             self.outfiles.append(self.copy_file(source, target_dir)[0])
++            if os.path.exists(source + '.link.json'):
++                self.outfiles.append(self.copy_file(source + '.link.json', target_dir)[0])
+ 
+     def get_outputs(self):
+         return self.outfiles
+-- 
+2.30.2
 
-     #######################################################################
-     #                     multiarray_tests module                         #

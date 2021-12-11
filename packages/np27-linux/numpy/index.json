@@ -2,13 +2,24 @@
   "scripts": [
     {
       "metadata": {
-        "Version": "1.*"
+        "Version": "1.16*"
       },
       "files": [
         "build.py",
         "numpy-static-patch.patch"
       ],
       "build_script": "build.py",
+      "static_pattern": "*"
+    },
+    {
+      "metadata": {
+        "Version": "1.15*"
+      },
+      "files": [
+        "build-1.15.py",
+        "numpy1.15-static-patch.patch"
+      ],
+      "build_script": "build-1.15.py",
       "static_pattern": "*"
     }
   ]
