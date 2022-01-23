@@ -11,7 +11,7 @@ def run(temp_dir: str):
     # We will build freetype first here and then base off that, but we will also have a separate freetype package.
     ft_dir = os.path.join(temp_dir, 'ft')
 
-    __np__.download_extract("http://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.11.0.tar.gz", ft_dir)
+    __np__.download_extract("http://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz", ft_dir)
 
     __np__.setup_compiler_env()
 
@@ -38,7 +38,7 @@ def run(temp_dir: str):
 
     __np__.run_build_tool_exe("ninja", "ninja.exe", "install")
 
-    __np__.download_extract("https://github.com/harfbuzz/harfbuzz/archive/refs/tags/3.1.2.zip", temp_dir)
+    __np__.download_extract("https://github.com/harfbuzz/harfbuzz/archive/refs/tags/2.6.4.zip", temp_dir)
 
     src_dir = glob.glob(os.path.join(temp_dir, "harfbuzz*"))[0]
     os.chdir(src_dir)

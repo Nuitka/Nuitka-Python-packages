@@ -1,0 +1,42 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "1.10.*"
+      },
+      "build_tools": [
+        "cmake",
+        "patch"
+      ],
+      "dependencies": [
+        "bullet",
+        "eigen",
+        "freetype",
+        "harfbuzz",
+        "jpeg",
+        "nvidiacg",
+        "ode",
+        "openal",
+        "ogg",
+        "opus",
+        "opusfile",
+        "png",
+        "squish",
+        "tiff",
+        "vorbis",
+        "zlib"
+      ],
+      "files": [
+        "build.py",
+        "Implement_static_python_build.patch"
+      ],
+      "build_script": "build.py"
+    }
+  ],
+  "sources": [
+    {
+      "version":"1.10.11",
+      "link": "https://github.com/panda3d/panda3d/archive/refs/tags/v1.10.11.zip"
+    }
+  ]
+}

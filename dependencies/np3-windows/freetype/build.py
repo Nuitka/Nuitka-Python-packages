@@ -7,7 +7,7 @@ import glob
 
 
 def run(temp_dir: str):
-    __np__.download_extract("http://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.11.0.tar.gz", temp_dir)
+    __np__.download_extract("http://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz", temp_dir)
 
     __np__.setup_compiler_env()
 
@@ -25,7 +25,7 @@ def run(temp_dir: str):
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
                               "-DCMAKE_INSTALL_PREFIX=" + install_dir,
-                              "-DCMAKE_BUILD_TYPE=Release",
+                              "-DCMAKE_BUILD_TYPE=Debug",
                               "-DZLIB_ROOT=" + __np__.find_dep_root("zlib"),
                               "-DWITH_HarfBuzz=ON", "-DWITH_BZip2=OFF",
                               "-DWITH_PNG=OFF",
