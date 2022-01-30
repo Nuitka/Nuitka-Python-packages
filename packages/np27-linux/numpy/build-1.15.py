@@ -16,8 +16,6 @@ def run(req,
         pycompilel
         ):
 
-    __np__.setup_compiler_env()
-
     os.chdir(source_dir)
 
     __np__.my_print("Starting numpy patching...")
