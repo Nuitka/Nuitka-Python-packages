@@ -24,8 +24,10 @@ def run(temp_dir: str):
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake.exe", "-G", "Ninja",
                               "-DCMAKE_BUILD_TYPE=Release",
-                              "-DOGG_ROOT=" + __np__.find_dep_root("ogg"),
-                              "-DOPUS_ROOT=" + __np__.find_dep_root("opus"),
+                              "-DOGG_INCLUDE_DIRS=" + __np__.find_dep_include("ogg"),
+                              "-DOGG_LIBRARIES=" + os.path.join(__np__.find_dep_libs("ogg"), "ogg.lib"),
+                              "-DOPUS_INCLUDE_DIRS=" + __np__.find_dep_include("opus"),
+                              "-DOPUS_LIBRARIES=" + os.path.join(__np__.find_dep_libs("opus"), "opus.lib"),
                               src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe")
 
