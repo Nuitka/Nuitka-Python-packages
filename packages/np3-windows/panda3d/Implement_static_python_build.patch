@@ -122,7 +122,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
 +            lib_dir_set = set()
 +            for (opt, name) in LIBNAMES:
 +                if opt != "OPENSSL" and ((opt=="ALWAYS") or (opt in opts)):
-+                    abs_path = name.replace(GetThirdpartyDir(), __np__.DEPENDENCY_INSTALL_DIR + "/")
++                    abs_path = name.replace(GetThirdpartyDir(), __np__.getDependencyInstallDir() + "/")
 +                    lib_set.add(os.path.basename(abs_path).replace(".lib", ""))
 +                    lib_dir = os.path.dirname(abs_path)
 +                    if lib_dir:
