@@ -6,7 +6,7 @@ import shutil
 
 
 def run(temp_dir: str):
-    __np__.download_extract("https://zlib.net/zlib1211.zip", temp_dir)
+    __np__.download_extract("https://github.com/madler/zlib/archive/refs/tags/v1.2.12.zip", temp_dir)
 
     __np__.setup_compiler_env()
 
