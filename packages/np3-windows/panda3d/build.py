@@ -61,5 +61,5 @@ def run(req: InstallRequirement,
                          os.path.join(__np__.find_dep_include("ogg"), "ogg", "*.h"))
     shutil.copytree(__np__.find_dep_root("zlib"), os.path.join("thirdparty", "win-libs-vc14-x64", "zlib"))
 
-    __np__.run_with_output("python.exe", os.path.join(source_dir, "makepanda", "makepanda.py"), "--everything", "--wheel", "--static", "--msvc-version=14.2", "--windows-sdk=10", "--threads=8", "--optimize=3")
+    __np__.run_with_output("python.exe", os.path.join(source_dir, "makepanda", "makepanda.py"), "--everything", "--wheel", "--static", "--msvc-version=14.2", "--windows-sdk=10", "--threads=8", "--optimize=4")
     __np__.run_with_output("python.exe", "-m", "pip", "install", glob.glob("panda3d*.whl")[0], "--force-reinstall")
