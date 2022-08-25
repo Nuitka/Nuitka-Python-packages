@@ -5,8 +5,7 @@
     "ninja"
   ],
   "dependencies": [
-    "harfbuzz",
-    "zlib"
+    "harfbuzz"
   ],
   "files": [
     "build.py"

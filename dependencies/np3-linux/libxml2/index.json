@@ -1,7 +1,6 @@
 {
   "version": "2.9.13",
   "dependencies": [
-    "iconv"
   ],
   "files": [
     "build.py"
