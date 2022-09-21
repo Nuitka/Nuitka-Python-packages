@@ -1,0 +1,20 @@
+diff --git a/setup.py b/setup.py
+index e5d0165..ec5ff95 100644
+--- a/setup.py
++++ b/setup.py
+@@ -722,15 +722,6 @@ setup(
+             extra_compile_args=EXT_CFLAGS,
+             extra_link_args=OBJC_LDFLAGS,
+         ),
+-    ]
+-    + [
+-        Extension(
+-            "PyObjCTest." + os.path.splitext(os.path.basename(test_source))[0],
+-            [test_source],
+-            extra_compile_args=EXT_CFLAGS,
+-            extra_link_args=OBJC_LDFLAGS,
+-        )
+-        for test_source in glob.glob(os.path.join("Modules", "objc", "test", "*.[mc]"))
+     ],
+     cmdclass={
+         "build_ext": oc_build_ext,

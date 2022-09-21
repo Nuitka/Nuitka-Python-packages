@@ -1,0 +1,12 @@
+{
+  "scripts": [
+    {
+      "metadata": { },
+      "files": [
+        "build.py",
+        "Disable-test.patch"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}
