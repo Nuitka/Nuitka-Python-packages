@@ -4,6 +4,7 @@ from typing import *
 import os
 import shutil
 import glob
+import sysconfig
 
 
 def run(temp_dir: str):
@@ -11,20 +12,17 @@ def run(temp_dir: str):
 
     src_dir = glob.glob(os.path.join(temp_dir, "libpng*"))[0]
 
-    build_dir = os.path.join(temp_dir, "build")
-    os.mkdir(build_dir)
-    os.chdir(build_dir)
+    prefix_dir = os.path.join(temp_dir, "prefix")
+    os.mkdir(prefix_dir)
+    os.chdir(src_dir)
 
     os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
-    os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"]
-    __np__.run_build_tool_exe("cmake", "cmake", "-G", "Ninja",
-                              "-DCMAKE_BUILD_TYPE=Release",
-                              "-DPNG_SHARED=OFF", "-DPNG_TESTS=OFF",
-                              "-DZLIB_LIBRARY=" + os.path.join(__np__.find_dep_libs("zlib"), "libz.a"),
-                              "-DZLIB_INCLUDE_DIR=" + __np__.find_dep_include("zlib"),
-                              src_dir)
-    __np__.run_build_tool_exe("ninja", "ninja")
+    os.environ["CFLAGS"] = sysconfig.get_config_var("CFLAGS")
+    print("bash", os.path.join(src_dir, "configure"), "--disable-shared", "--with-zlib-prefix=" + __np__.find_dep_root("zlib"))
+    __np__.run_with_output("bash", os.path.join(src_dir, "configure"), "--disable-shared", "--with-zlib-prefix=" + __np__.find_dep_root("zlib"), "--prefix=" + prefix_dir)
+    __np__.run_with_output("sed", "-i", '', 's/#if PNG_ZLIB_VERNUM != 0 && PNG_ZLIB_VERNUM != ZLIB_VERNUM/#if 0/g', os.path.join(src_dir, "pngpriv.h"))
+    __np__.run_with_output("make")
+    __np__.run_with_output("make", "install")
 
-    __np__.install_dep_libs("png", os.path.join(build_dir, "*.a"))
-    __np__.install_dep_include("png", os.path.join(src_dir, "*.h"), base_dir=os.path.join(src_dir, "include"))
-    __np__.install_dep_include("png", os.path.join(build_dir, "*.h"))
+    __np__.install_dep_libs("png", os.path.join(prefix_dir, "lib", "*"))
+    __np__.install_dep_include("png", os.path.join(prefix_dir, "include", "**", "*.h"), base_dir=os.path.join(prefix_dir, "include"))

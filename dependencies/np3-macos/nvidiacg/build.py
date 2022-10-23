@@ -6,9 +6,16 @@ import sys
 import shutil
 import glob
 import sysconfig
+import platform
 
 
 def run(temp_dir: str):
+    if platform.processor() == "arm":
+        os.makedirs(os.path.join(__np__.getDependencyInstallDir(), "nvidiacg"), exist_ok=True)
+        with open(os.path.join(__np__.getDependencyInstallDir(), "nvidiacg", "no-op.txt"), 'w') as f:
+            f.write("Unavailable for arm.")
+        return  # cg is not supported for arm64. :(
+
     __np__.download_extract("https://www.panda3d.org/download/panda3d-1.10.11/panda3d-1.10.11-tools-mac.tar.gz", temp_dir)
 
     __np__.install_dep_libs("nvidiacg", os.path.join(temp_dir, "panda3d-1.10.11/thirdparty/darwin-libs-a/nvidiacg", "lib", "*.dylib"))

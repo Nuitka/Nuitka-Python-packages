@@ -60,7 +60,12 @@ def run(req: InstallRequirement,
                          os.path.join(__np__.find_dep_include("ogg"), "ogg", "*.h"))
     shutil.copytree(__np__.find_dep_root("zlib"), os.path.join("thirdparty", "darwin-libs-a", "zlib"))
 
-    os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
+    # Use macOS 10.9 as the minimum when building for intel.
+    if "arm64" not in __np__.run_with_output("file", sys.executable, quiet=True):
+        os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
 
+    os.environ["CFLAGS"] = "-flto=thin"
+
+    print("--everything", "--wheel", "--static", f"--python-libdir={sys.prefix}/lib", f"--python-incdir={sys.prefix}/include", "--threads=8", "--optimize=4")
     __np__.run_with_output(sys.executable, os.path.join(source_dir, "makepanda", "makepanda.py"), "--everything", "--wheel", "--static", f"--python-libdir={sys.prefix}/lib", f"--python-incdir={sys.prefix}/include", "--threads=8", "--optimize=4")
     __np__.run_with_output(sys.executable, "-m", "pip", "install", glob.glob("panda3d*.whl")[0], "--force-reinstall")

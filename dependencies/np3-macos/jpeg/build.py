@@ -5,6 +5,8 @@ import os
 import shutil
 import glob
 
+import sysconfig
+
 
 def run(temp_dir: str):
     __np__.download_extract("https://ijg.org/files/jpegsr9d.zip", temp_dir)
@@ -14,6 +16,7 @@ def run(temp_dir: str):
 
     os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"]
+    os.environ["CFLAGS"] = sysconfig.get_config_var("CFLAGS")
     shutil.copy(os.path.join(temp_dir, "libjpeg.cmake"), os.path.join(src_dir, "CMakeLists.txt"))
     shutil.copy(os.path.join(temp_dir, "libjpeg-jconfig.h.cmake"), os.path.join(src_dir, "jconfig.h.cmake"))
 

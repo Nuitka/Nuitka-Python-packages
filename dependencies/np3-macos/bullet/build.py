@@ -4,6 +4,7 @@ from typing import *
 import os
 import shutil
 import glob
+import sysconfig
 
 
 def run(temp_dir: str):
@@ -23,6 +24,7 @@ def run(temp_dir: str):
     os.mkdir(install_dir)
 
     os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
+    os.environ["CFLAGS"] = sysconfig.get_config_var("CFLAGS")
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake", "-G", "Ninja",
                               "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_CPU_DEMOS=OFF",

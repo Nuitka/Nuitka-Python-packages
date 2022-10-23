@@ -20,6 +20,7 @@ def run(temp_dir: str):
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"]
     __np__.run_build_tool_exe("cmake", "cmake", "-G", "Ninja",
                               "-DCMAKE_BUILD_TYPE=Release",
+                              "-DBUILD_SQUISH_WITH_SSE2=OFF",
                               src_dir)
     __np__.run_build_tool_exe("ninja", "ninja")
 
