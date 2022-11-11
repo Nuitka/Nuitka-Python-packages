@@ -35,8 +35,8 @@
   ],
   "sources": [
     {
-      "version":"1.10.11",
-      "link": "https://github.com/panda3d/panda3d/archive/refs/tags/v1.10.11.zip"
+      "version":"1.10.12",
+      "link": "https://github.com/panda3d/panda3d/archive/refs/tags/v1.10.12.zip"
     }
   ]
 }
