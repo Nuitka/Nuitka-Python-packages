@@ -1,25 +1,42 @@
-Index: panda/src/display/p3display_ext_composite.cxx
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/panda/src/display/p3display_ext_composite.cxx b/panda/src/display/p3display_ext_composite.cxx
---- a/panda/src/display/p3display_ext_composite.cxx	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/panda/src/display/p3display_ext_composite.cxx	(date 1644109342421)
-@@ -1,3 +1,4 @@
-+#include "graphicsEngine_ext.cxx"
- #include "graphicsStateGuardian_ext.cxx"
- #include "graphicsWindow_ext.cxx"
- #include "pythonGraphicsWindowProc.cxx"
 Index: makepanda/makepandacore.py
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/makepanda/makepandacore.py b/makepanda/makepandacore.py
---- a/makepanda/makepandacore.py	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/makepanda/makepandacore.py	(date 1644109342422)
-@@ -2181,6 +2181,9 @@
+--- a/makepanda/makepandacore.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/makepanda/makepandacore.py	(date 1668276312436)
+@@ -1827,6 +1827,9 @@
+                 else:
+                     print(GetColor("cyan") + "Couldn't find library lib" + libname + " in thirdparty directory " + thirdparty_dir + GetColor())
+ 
++        if target_pkg == "OPENAL":
++            LibName(target_pkg, "-framework CoreServices -framework CoreFoundation -framework AudioUnit -framework AudioToolbox -framework CoreAudio")
++
+         for d, v in defs.values():
+             DefSymbol(target_pkg, d, v)
+         return
+@@ -1845,7 +1848,8 @@
+         elif VERBOSE:
+             print(ColorText("cyan", "Couldn't find the framework %s" % (framework)))
+ 
+-    elif not custom_loc and LocateBinary(tool) != None and (tool != "pkg-config" or pkgconfig != None):
++    elif pkg in ("GL", "GLES", "GLES2", "EGL", "X11") and not custom_loc and LocateBinary(tool) != None and (
++            tool != "pkg-config" or pkgconfig != None):
+         if (isinstance(pkgconfig, str) or tool != "pkg-config"):
+             if (PkgConfigHavePkg(pkgconfig, tool)):
+                 return PkgConfigEnable(target_pkg, pkgconfig, tool)
+@@ -1871,6 +1875,9 @@
+         # Okay, our pkg-config attempts failed. Let's try locating the libs by ourselves.
+         have_pkg = True
+         for l in libs:
++            if pkg not in ("GL", "GLES", "GLES2", "EGL", "PYTHON", "X11"):
++                have_pkg = False
++                break
+             libname = l
+             if l.startswith("lib"):
+                 libname = l[3:]
+@@ -2186,6 +2193,9 @@
              sdkdir += "-dbg"
          if GetTargetArch() == 'x64':
              sdkdir += "-x64"
@@ -29,7 +46,7 @@ diff --git a/makepanda/makepandacore.py b/makepanda/makepandacore.py
  
          SDK["PYTHON"] = sdkdir
          SDK["PYTHONEXEC"] = SDK["PYTHON"].replace('\\', '/') + "/python"
-@@ -2193,12 +2196,20 @@
+@@ -2198,12 +2208,20 @@
              exit("Could not find %s!" % SDK["PYTHONEXEC"])
  
          # Determine which version it is by checking which dll is in the directory.
@@ -56,7 +73,7 @@ diff --git a/makepanda/makepandacore.py b/makepanda/makepandacore.py
  
          if len(py_dlls) == 0:
              exit("Could not find the Python dll in %s." % (SDK["PYTHON"]))
-@@ -2206,7 +2217,7 @@
+@@ -2211,7 +2229,7 @@
              exit("Found multiple Python dlls in %s." % (SDK["PYTHON"]))
  
          py_dll = os.path.basename(py_dlls[0])
@@ -65,6 +82,123 @@ diff --git a/makepanda/makepandacore.py b/makepanda/makepandacore.py
          ver = py_dllver[0] + '.' + py_dllver[1:]
  
          SDK["PYTHONVERSION"] = "python" + ver
+@@ -3491,12 +3509,12 @@
+ def GetExtensionSuffix():
+     target = GetTarget()
+ 
+-    if sys.version_info >= (3, 5) and target == 'windows':
++    if sys.version_info >= (3, 5) and target == 'windows' and False:
+         if GetTargetArch() == 'x64':
+             return '.cp%d%d-win_amd64.pyd' % (sys.version_info[:2])
+         else:
+             return '.cp%d%d-win32.pyd' % (sys.version_info[:2])
+-    elif sys.version_info >= (3, 0):
++    elif sys.version_info >= (3, 0) and False:
+         import _imp
+         return _imp.extension_suffixes()[0]
+ 
+Index: panda/src/pgraph/loader.cxx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/panda/src/pgraph/loader.cxx b/panda/src/pgraph/loader.cxx
+--- a/panda/src/pgraph/loader.cxx	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/panda/src/pgraph/loader.cxx	(date 1668276280550)
+@@ -34,6 +34,17 @@
+ 
+ using std::string;
+ 
++#ifdef LINK_ALL_STATIC
++
++#if defined(HAVE_PTLOADER)
++extern "C" void init_libptloader();
++#endif
++#if defined(HAVE_ASSIMP)
++extern "C" void init_libassimp();
++#endif
++
++#endif
++
+ bool Loader::_file_types_loaded = false;
+ PT(Loader) Loader::_global_ptr;
+ TypeHandle Loader::_type_handle;
+@@ -518,6 +529,20 @@
+         loader_cat.info()
+           << "loading file type module: " << name << std::endl;
+         void *tmp = load_dso(get_plugin_path().get_value(), dlname);
++
++#ifdef LINK_ALL_STATIC
++#ifdef HAVE_PTLOADER
++        if (name == "p3ptloader") {
++          tmp = (void*)init_libptloader;
++        }
++#endif
++#ifdef HAVE_ASSIMP
++        if (name == "p3assimp") {
++          tmp = (void*)init_libassimp;
++        }
++#endif
++#endif
++
+         if (tmp == nullptr) {
+           loader_cat.warning()
+             << "Unable to load " << dlname.to_os_specific()
+Index: makepanda/installpanda.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/makepanda/installpanda.py b/makepanda/installpanda.py
+--- a/makepanda/installpanda.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/makepanda/installpanda.py	(date 1668276280091)
+@@ -229,7 +229,7 @@
+         oscmd("echo '"+libdir+"/panda3d'>    "+destdir+"/etc/ld.so.conf.d/panda3d.conf")
+ 
+     for base in os.listdir(outputdir+"/lib"):
+-        if (not base.endswith(".a")) or base == "libp3pystub.a":
++        if not base.endswith(".a"):
+             # We really need to specify -R in order not to follow symlinks on non-GNU
+             oscmd("cp -R -P "+outputdir+"/lib/"+base+" "+destdir+libdir+"/panda3d/"+base)
+ 
+Index: dtool/src/dtoolbase/dtoolsymbols.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/dtool/src/dtoolbase/dtoolsymbols.h b/dtool/src/dtoolbase/dtoolsymbols.h
+--- a/dtool/src/dtoolbase/dtoolsymbols.h	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/dtool/src/dtoolbase/dtoolsymbols.h	(date 1668276280058)
+@@ -125,16 +125,4 @@
+   #define EXPTP_MISC IMPORT_TEMPL
+ #endif /* BUILDING_MISC */
+ 
+-
+-/* These two are always defined empty, because pystub is statically
+-   built.  But we leave the symbol around in case we change our minds
+-   to make pystub once again be a dynamic library. */
+-#if __GNUC__ >= 4
+-/* In GCC, though, we still need to mark the symbols as visible. */
+-#define EXPCL_PYSTUB __attribute__((visibility("default")))
+-#else
+-#define EXPCL_PYSTUB
+-#endif
+-#define EXPTP_PYSTUB
+-
+ #endif
+Index: panda/src/display/p3display_ext_composite.cxx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/panda/src/display/p3display_ext_composite.cxx b/panda/src/display/p3display_ext_composite.cxx
+--- a/panda/src/display/p3display_ext_composite.cxx	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/panda/src/display/p3display_ext_composite.cxx	(date 1668276280539)
+@@ -1,3 +1,4 @@
++#include "graphicsEngine_ext.cxx"
+ #include "graphicsStateGuardian_ext.cxx"
+ #include "graphicsWindow_ext.cxx"
+ #include "pythonGraphicsWindowProc.cxx"
 Index: panda/src/display/graphicsEngine_ext.cxx
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -72,8 +206,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/panda/src/display/graphicsEngine_ext.cxx b/panda/src/display/graphicsEngine_ext.cxx
 new file mode 100644
---- /dev/null	(date 1644109342419)
-+++ b/panda/src/display/graphicsEngine_ext.cxx	(date 1644109342419)
+--- /dev/null	(date 1668276280512)
++++ b/panda/src/display/graphicsEngine_ext.cxx	(date 1668276280512)
 @@ -0,0 +1,67 @@
 +/**
 + * All use of this software is subject to the terms of the revised BSD
@@ -92,7 +226,7 @@ new file mode 100644
 +#include "pandaegg.h"
 +#endif
 +
-+extern "C" extern void init_libOpenALAudio();
++extern "C" void init_libOpenALAudio();
 +#endif
 +
 +#ifdef HAVE_PYTHON
@@ -142,23 +276,6 @@ new file mode 100644
 +}
 +
 +#endif
-Index: makepanda/makepackage.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/makepanda/makepackage.py b/makepanda/makepackage.py
---- a/makepanda/makepackage.py	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/makepanda/makepackage.py	(date 1644108474181)
-@@ -614,8 +614,6 @@
- 
-     oscmd("mkdir -p dstroot/headers/%s/lib" % installdir)
-     oscmd("cp -R %s/include               dstroot/headers/%s/include" % (outputdir, installdir))
--    if os.path.isfile(outputdir + "/lib/libp3pystub.a"):
--        oscmd("cp -R -P %s/lib/libp3pystub.a dstroot/headers/%s/lib/" % (outputdir, installdir))
- 
-     if os.path.isdir("samples"):
-         oscmd("mkdir -p dstroot/samples/%s/samples" % installdir)
 Index: panda/src/display/graphicsEngine_ext.h
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -166,8 +283,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/panda/src/display/graphicsEngine_ext.h b/panda/src/display/graphicsEngine_ext.h
 new file mode 100644
---- /dev/null	(date 1644109342420)
-+++ b/panda/src/display/graphicsEngine_ext.h	(date 1644109342420)
+--- /dev/null	(date 1668276280523)
++++ b/panda/src/display/graphicsEngine_ext.h	(date 1668276280523)
 @@ -0,0 +1,34 @@
 +/**
 + * All use of this software is subject to the terms of the revised BSD
@@ -203,156 +320,534 @@ new file mode 100644
 +#endif  // HAVE_PYTHON
 +
 +#endif  // GRAPHICSENGINE_EXT_H
-Index: dtool/src/dtoolbase/dtoolsymbols.h
+Index: makepanda/makepanda.py
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/dtool/src/dtoolbase/dtoolsymbols.h b/dtool/src/dtoolbase/dtoolsymbols.h
---- a/dtool/src/dtoolbase/dtoolsymbols.h	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/dtool/src/dtoolbase/dtoolsymbols.h	(date 1644108391792)
-@@ -125,16 +125,4 @@
-   #define EXPTP_MISC IMPORT_TEMPL
- #endif /* BUILDING_MISC */
+diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
+--- a/makepanda/makepanda.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/makepanda/makepanda.py	(date 1668276312408)
+@@ -7,6 +7,9 @@
+ # panda3d.
+ #
+ ########################################################################
++import json
++import traceback
++
+ try:
+     import sys, os, platform, time, stat, re, getopt, threading, signal, shutil
+     if sys.platform == "darwin" or sys.version_info >= (2, 6):
+@@ -684,6 +687,9 @@
+ IncDirectory("ALWAYS", GetOutputDir()+"/tmp")
+ IncDirectory("ALWAYS", GetOutputDir()+"/include")
  
++if GetLinkAllStatic():
++    DefSymbol("ALWAYS", "ALL_STATIC", "")
++
+ if (COMPILER == "MSVC"):
+     PkgDisable("X11")
+     PkgDisable("GLES")
+@@ -764,6 +770,8 @@
+     LibName("GLES2", "libGLESv2.lib")
+     LibName("EGL", "libEGL.lib")
+     LibName("MSIMG", "msimg32.lib")
++    LibName("VERSION", "version.lib")
++    LibName("SHLWAPI", "shlwapi.lib")
+     if (PkgSkip("DIRECTCAM")==0): LibName("DIRECTCAM", "strmiids.lib")
+     if (PkgSkip("DIRECTCAM")==0): LibName("DIRECTCAM", "quartz.lib")
+     if (PkgSkip("DIRECTCAM")==0): LibName("DIRECTCAM", "odbc32.lib")
+@@ -774,8 +782,10 @@
+             LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libpandassl.lib")
+             LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libpandaeay.lib")
+         elif os.path.isfile(GetThirdpartyDir() + "openssl/lib/ssleay32.lib"):
+-            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libeay32.lib")
+-            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/ssleay32.lib")
++            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libcrypto.lib")
++            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libssl.lib")
++            LibName("OPENSSL", "crypt32.lib")
++            LibName("OPENSSL", "ws2_32.lib")
+         else:
+             LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libssl.lib")
+             LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libcrypto.lib")
+@@ -828,7 +838,11 @@
+         IncDirectory("OPENEXR", GetThirdpartyDir() + "openexr/include/OpenEXR")
+         IncDirectory("OPENEXR", GetThirdpartyDir() + "openexr/include/Imath")
+     if (PkgSkip("JPEG")==0):     LibName("JPEG",     GetThirdpartyDir() + "jpeg/lib/jpeg-static.lib")
+-    if (PkgSkip("ZLIB")==0):     LibName("ZLIB",     GetThirdpartyDir() + "zlib/lib/zlibstatic.lib")
++    if (PkgSkip("ZLIB")==0):
++        if os.path.isfile(GetThirdpartyDir() + "zlib/lib/zlibstatic.lib"):
++            LibName("ZLIB", GetThirdpartyDir() + "zlib/lib/zlibstatic.lib")
++        else:
++            LibName("ZLIB", GetThirdpartyDir() + "zlib/lib/zlib.lib")
+     if (PkgSkip("VRPN")==0):     LibName("VRPN",     GetThirdpartyDir() + "vrpn/lib/vrpn.lib")
+     if (PkgSkip("VRPN")==0):     LibName("VRPN",     GetThirdpartyDir() + "vrpn/lib/quat.lib")
+     if (PkgSkip("NVIDIACG")==0): LibName("CGGL",     GetThirdpartyDir() + "nvidiacg/lib/cgGL.lib")
+@@ -837,7 +851,7 @@
+     if (PkgSkip("FREETYPE")==0): LibName("FREETYPE", GetThirdpartyDir() + "freetype/lib/freetype.lib")
+     if (PkgSkip("HARFBUZZ")==0):
+         LibName("HARFBUZZ", GetThirdpartyDir() + "harfbuzz/lib/harfbuzz.lib")
+-        IncDirectory("HARFBUZZ", GetThirdpartyDir() + "harfbuzz/include/harfbuzz")
++        IncDirectory("HARFBUZZ", GetThirdpartyDir() + "harfbuzz/include")
+     if (PkgSkip("FFTW")==0):     LibName("FFTW",     GetThirdpartyDir() + "fftw/lib/fftw3.lib")
+     if (PkgSkip("ARTOOLKIT")==0):LibName("ARTOOLKIT",GetThirdpartyDir() + "artoolkit/lib/libAR.lib")
+     if (PkgSkip("OPENCV")==0):   LibName("OPENCV",   GetThirdpartyDir() + "opencv/lib/cv.lib")
+@@ -895,17 +909,21 @@
+         DefSymbol("WX",     "_UNICODE", "")
+         DefSymbol("WX",     "UNICODE", "")
+     if (PkgSkip("VORBIS")==0):
+-        for lib in ('ogg', 'vorbis', 'vorbisfile'):
++        for lib in ('vorbis', 'vorbisfile'):
+             path = GetThirdpartyDir() + "vorbis/lib/lib{0}_static.lib".format(lib)
+             if not os.path.isfile(path):
+                 path = GetThirdpartyDir() + "vorbis/lib/{0}.lib".format(lib)
+             LibName("VORBIS", path)
++        path = GetThirdpartyDir() + "ogg/lib/libogg_static.lib".format(lib)
++        if not os.path.isfile(path):
++            path = GetThirdpartyDir() + "ogg/lib/ogg.lib".format(lib)
++        LibName("VORBIS", path)
+     if (PkgSkip("OPUS")==0):
+         IncDirectory("OPUS", GetThirdpartyDir() + "opus/include/opus")
+         for lib in ('ogg', 'opus', 'opusfile'):
+-            path = GetThirdpartyDir() + "opus/lib/lib{0}_static.lib".format(lib)
++            path = GetThirdpartyDir() + "{0}/lib/lib{0}_static.lib".format(lib)
+             if not os.path.isfile(path):
+-                path = GetThirdpartyDir() + "opus/lib/{0}.lib".format(lib)
++                path = GetThirdpartyDir() + "{0}/lib/{0}.lib".format(lib)
+             LibName("OPUS", path)
+     for pkg in MAYAVERSIONS:
+         if (PkgSkip(pkg)==0):
+@@ -1413,12 +1431,20 @@
+                 if (opt=="ALWAYS") or (opt in opts): cmd += " /D" + var + "=" + val
+             if (opts.count('MSFORSCOPE')): cmd += ' /Zc:forScope-'
+ 
+-            if (optlevel==1): cmd += " /MDd /Zi /RTCs /GS"
+-            if (optlevel==2): cmd += " /MDd /Zi"
+-            if (optlevel==3): cmd += " /MD /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast"
+-            if (optlevel==4):
+-                cmd += " /MD /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL"
+-                cmd += " /Oy /Zp16"      # jean-claude add /Zp16 insures correct static alignment for SSEx
++            if GetLinkAllStatic():
++                if (optlevel==1): cmd += " /MTd /Zi /RTCs /GS"
++                if (optlevel==2): cmd += " /MTd /Zi"
++                if (optlevel==3): cmd += " /MT /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast"
++                if (optlevel==4):
++                    cmd += " /MT /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL"
++                    cmd += " /Oy /Zp16"      # jean-claude add /Zp16 insures correct static alignment for SSEx
++            else:
++                if (optlevel==1): cmd += " /MDd /Zi /RTCs /GS"
++                if (optlevel==2): cmd += " /MDd /Zi"
++                if (optlevel==3): cmd += " /MD /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast"
++                if (optlevel==4):
++                    cmd += " /MD /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL"
++                    cmd += " /Oy /Zp16 "      # jean-claude add /Zp16 insures correct static alignment for SSEx
+ 
+             cmd += " /Fd" + os.path.splitext(obj)[0] + ".pdb"
+ 
+@@ -1887,6 +1913,31 @@
+             for x in obj:
+                 if not x.endswith('.lib'):
+                     cmd += ' ' + BracketNameWithQuotes(x)
++            import __np__
++            lib_set = set()
++            lib_dir_set = set()
++            for (opt, name) in LIBNAMES:
++                if opt != "OPENSSL" and ((opt=="ALWAYS") or (opt in opts)):
++                    abs_path = name.replace(GetThirdpartyDir(), __np__.getDependencyInstallDir() + "/")
++                    lib_set.add(os.path.basename(abs_path).replace(".lib", ""))
++                    lib_dir = os.path.dirname(abs_path)
++                    if lib_dir:
++                        lib_dir_set.add(lib_dir)
++            for (opt, dir) in LIBDIRECTORIES:
++                if (opt=="ALWAYS") or (opt in opts):
++                    lib_dir_set.add(dir)
++            for dependent_lib in obj:
++                if dependent_lib.endswith('.lib'):
++                    if os.path.exists(dependent_lib + ".link.json"):
++                        with open(dependent_lib + ".link.json", 'r') as f:
++                            link_data = json.load(f)
++                        lib_set.update(link_data["libraries"])
++                        lib_dir_set.update(link_data["library_dirs"])
++                    lib_dir_set.add("lib")
++                    lib_set.add(os.path.basename(dependent_lib).replace(".lib", ""))
++            link_info = {"libraries": list(lib_set), "library_dirs": list(lib_dir_set)}
++            with open(lib + ".link.json", 'w') as f:
++                json.dump(link_info, f)
+             oscmd(cmd)
+         else:
+             # Choose Intel linker; from Jean-Claude
+@@ -1913,6 +1964,21 @@
+ 
+         oscmd(GetRanlib() + ' ' + BracketNameWithQuotes(lib))
+ 
++        link_data = {
++            "libraries": [x[1][2:] for x in LIBNAMES if x[0] in opts and x[1].startswith('-l')] +
++                         [os.path.splitext(os.path.basename(x[1]))[0][3 if os.path.basename(x[1]).startswith('lib') else 0:] for x in LIBNAMES if x[0] in opts and ('.so' in x[1] or '.dylib' in x[1]) and not x[1].startswith('-dylib')],
++            "library_dirs": [], "runtime_library_dirs": [],
++            "extra_postargs": ["-framework", "IOKit", "-framework", "CoreAudio", "-framework", "CoreVideo"] +
++                              [y for x in LIBNAMES if x[0] in opts and x[1].startswith('-framework') for y in
++                               x[1].split(" ")]
++        }
++        if "NVIDIACG" in opts:
++            import __np__
++            link_data["library_dirs"].append(os.path.join(__np__.find_dep_root("nvidiacg"), "lib"))
++        import json
++        with open(lib + '.link.json', 'w') as f:
++            f.write(json.dumps(link_data))
++
+ ########################################################################
+ ##
+ ## CompileLink
+@@ -1925,21 +1991,28 @@
+             cmd = "link /nologo "
+             if HasTargetArch():
+                 cmd += " /MACHINE:" + GetTargetArch().upper()
+-            if ("MFC" not in opts):
++            if not GetLinkAllStatic() and "MFC" not in opts:
+                 cmd += " /NOD:MFC90.LIB /NOD:MFC80.LIB /NOD:LIBCMT"
+-            cmd += " /NOD:LIBCI.LIB /DEBUG"
+-            cmd += " /nod:libc /nod:libcmtd /nod:atlthunk /nod:atls /nod:atlsd"
+             if (GetOrigExt(dll) != ".exe"): cmd += " /DLL"
+             optlevel = GetOptimizeOption(opts)
+-            if (optlevel==1): cmd += " /MAP /MAPINFO:EXPORTS /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
+-            if (optlevel==2): cmd += " /MAP:NUL /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
+-            if (optlevel==3): cmd += " /MAP:NUL /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
+-            if (optlevel==4): cmd += " /MAP:NUL /LTCG /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
+-            if ("MFC" in opts):
++            if (optlevel==1): cmd += " /MAP /MAPINFO:EXPORTS "
++            if (optlevel==2): cmd += " /MAP:NUL "
++            if (optlevel==3): cmd += " /MAP:NUL "
++            if (optlevel==4): cmd += " /MAP:NUL /LTCG "
++            if not GetLinkAllStatic() and "MFC" in opts:
+                 if (optlevel<=2): cmd += " /NOD:MSVCRTD.LIB mfcs100d.lib MSVCRTD.lib"
+                 else: cmd += " /NOD:MSVCRT.LIB mfcs100.lib MSVCRT.lib"
+-            cmd += " /FIXED:NO /OPT:REF /STACK:4194304 /INCREMENTAL:NO "
++            cmd += " /FIXED:NO /OPT:REF /STACK:4194304 "
+             cmd += ' /OUT:' + BracketNameWithQuotes(dll)
++            if not GetLinkAllStatic():
++                cmd += " /NOD:LIBCI.LIB /DEBUG"
++                cmd += " /nod:libc /nod:libcmtd /nod:atlthunk /nod:atls /nod:atlsd"
++                if (optlevel==1): cmd += " /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
++                if (optlevel==2): cmd += " /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
++                if (optlevel==3): cmd += " /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
++                if (optlevel==4): cmd += " /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
++                cmd += " /INCREMENTAL:NO"
++
+ 
+             if not PkgSkip("PYTHON"):
+                 # If we're building without Python, don't pick it up implicitly.
+@@ -1950,12 +2023,6 @@
+                     else:
+                         cmd += ' /NOD:{}.lib'.format(pythonv)
+ 
+-                # Yes, we know we are importing "locally defined symbols".
+-                for x in obj:
+-                    if x.endswith('libp3pystub.lib'):
+-                        cmd += ' /ignore:4049,4217'
+-                        break
 -
--/* These two are always defined empty, because pystub is statically
--   built.  But we leave the symbol around in case we change our minds
--   to make pystub once again be a dynamic library. */
--#if __GNUC__ >= 4
--/* In GCC, though, we still need to mark the symbols as visible. */
--#define EXPCL_PYSTUB __attribute__((visibility("default")))
--#else
--#define EXPCL_PYSTUB
--#endif
--#define EXPTP_PYSTUB
+             # Set the subsystem.  Specify that we want to target Windows XP.
+             subsystem = GetValueOption(opts, "SUBSYSTEM:") or "CONSOLE"
+             cmd += " /SUBSYSTEM:" + subsystem
+@@ -2146,6 +2213,8 @@
+         if GetTarget() != 'freebsd':
+             cmd += " -ldl"
+ 
++        cmd += " -framework IOKit -framework CoreAudio -framework CoreVideo"
++
+         oscmd(cmd)
+ 
+         if GetOptimizeOption(opts) == 4 and GetTarget() in ('linux', 'android'):
+@@ -3284,7 +3353,7 @@
+ if PkgSkip("EGG") or GetLinkAllStatic():
+     confautoprc = confautoprc.replace("load-file-type egg pandaegg", "#load-file-type egg pandaegg")
+ 
+-if PkgSkip("PANDATOOL") or PkgSkip("EGG") or GetLinkAllStatic():
++if PkgSkip("PANDATOOL") or PkgSkip("EGG"):
+     confautoprc = confautoprc.replace("load-file-type p3ptloader", "#load-file-type p3ptloader")
+ 
+ if PkgSkip("FFMPEG") or GetLinkAllStatic():
+@@ -3312,19 +3381,19 @@
+     if not PkgSkip("FMODEX"):
+         configprc = configprc.replace("p3openal_audio", "p3fmod_audio")
+ 
+-if PkgSkip("GL") or GetLinkAllStatic():
++if PkgSkip("GL"):
+     configprc = configprc.replace("\nload-display pandagl", "\n#load-display pandagl")
+ 
+ if PkgSkip("GLES") or GetLinkAllStatic():
+     configprc = configprc.replace("\n#load-display pandagles", "")
+ 
+-if PkgSkip("DX9") or GetLinkAllStatic():
++if PkgSkip("DX9"):
+     configprc = configprc.replace("\n#load-display pandadx9", "")
+ 
+ if PkgSkip("TINYDISPLAY") or GetLinkAllStatic():
+     configprc = configprc.replace("\n#load-display p3tinydisplay", "")
+ 
+-if PkgSkip("OPENAL") or GetLinkAllStatic():
++if PkgSkip("OPENAL"):
+     configprc = configprc.replace("audio-library-name p3openal_audio", "#audio-library-name p3openal_audio")
+ 
+ if GetTarget() == 'windows':
+@@ -3441,13 +3510,14 @@
+             CopyAllFiles(GetOutputDir() + "/bin/", tp_dir + "extras/bin/")
+ 
+         if not PkgSkip("PYTHON") and not RTDIST:
+-            # We need to copy the Python DLL to the bin directory for now.
+-            pydll = "/" + SDK["PYTHONVERSION"].replace(".", "")
+-            if GetOptimize() <= 2:
+-                pydll += "_d.dll"
+-            else:
+-                pydll += ".dll"
+-            CopyFile(GetOutputDir() + "/bin" + pydll, SDK["PYTHON"] + pydll)
++            if not GetLinkAllStatic():
++                # We need to copy the Python DLL to the bin directory for now.
++                pydll = "/" + SDK["PYTHONVERSION"].replace(".", "")
++                if GetOptimize() <= 2:
++                    pydll += "_d.dll"
++                else:
++                    pydll += ".dll"
++                CopyFile(GetOutputDir() + "/bin" + pydll, SDK["PYTHON"] + pydll)
+ 
+             for fn in glob.glob(SDK["PYTHON"] + "/vcruntime*.dll"):
+                 CopyFile(GetOutputDir() + "/bin/", fn)
+@@ -3567,7 +3637,6 @@
+ CopyAllHeaders('dtool/src/dconfig')
+ CopyAllHeaders('dtool/src/interrogatedb')
+ CopyAllHeaders('dtool/metalibs/dtoolconfig')
+-CopyAllHeaders('dtool/src/pystub')
+ CopyAllHeaders('dtool/src/interrogate')
+ CopyAllHeaders('dtool/src/test_interrogate')
+ CopyAllHeaders('panda/src/putil')
+@@ -3763,6 +3832,13 @@
+     'libpandaegg.dll',
+ ] + COMMON_PANDA_LIBS
+ 
++if GetLinkAllStatic() and not PkgSkip("GL"):
++    COMMON_EGG2X_LIBS+=['libpandagl.dll']
++if GetLinkAllStatic() and not PkgSkip("DX9"):
++    COMMON_EGG2X_LIBS+=['libpandadx9.dll']
++if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
++    COMMON_EGG2X_LIBS+=['libp3tinydisplay.dll']
++
+ ########################################################################
+ #
+ # This section contains a list of all the files that need to be compiled.
+@@ -3875,17 +3951,6 @@
+ PyTargetAdd('interrogatedb.pyd', input='libp3dtoolconfig.dll')
+ PyTargetAdd('interrogatedb.pyd', input='libp3interrogatedb.dll')
+ 
+-#
+-# DIRECTORY: dtool/src/pystub/
+-#
 -
- #endif
-Index: dtool/src/dtoolutil/executionEnvironment.cxx
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/dtool/src/dtoolutil/executionEnvironment.cxx b/dtool/src/dtoolutil/executionEnvironment.cxx
---- a/dtool/src/dtoolutil/executionEnvironment.cxx	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/dtool/src/dtoolutil/executionEnvironment.cxx	(date 1644109342424)
-@@ -453,7 +453,7 @@
- string ExecutionEnvironment::
- ns_get_dtool_name() const {
-   if (_dtool_name.empty()) {
--    return "unknown";
-+    return ns_get_binary_name();
-   }
-   return _dtool_name;
- }
-Index: makepanda/installpanda.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/makepanda/installpanda.py b/makepanda/installpanda.py
---- a/makepanda/installpanda.py	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/makepanda/installpanda.py	(date 1644108391799)
-@@ -226,7 +226,7 @@
-         oscmd("echo '"+libdir+"/panda3d'>    "+destdir+"/etc/ld.so.conf.d/panda3d.conf")
+-if not RUNTIME and not RTDIST:
+-  OPTS=['DIR:dtool/src/pystub']
+-  TargetAdd('p3pystub_pystub.obj', opts=OPTS, input='pystub.cxx')
+-  TargetAdd('libp3pystub.lib', input='p3pystub_pystub.obj')
+-  #TargetAdd('libp3pystub.lib', input='libp3dtool.dll')
+-  TargetAdd('libp3pystub.lib', opts=['ADVAPI'])
+-
+ #
+ # DIRECTORY: dtool/src/interrogate/
+ #
+@@ -4106,7 +4171,10 @@
+ #
  
-     for base in os.listdir(outputdir+"/lib"):
--        if (not base.endswith(".a")) or base == "libp3pystub.a":
-+        if not base.endswith(".a"):
-             # We really need to specify -R in order not to follow symlinks on non-GNU
-             oscmd("cp -R -P "+outputdir+"/lib/"+base+" "+destdir+libdir+"/panda3d/"+base)
+ if (not RUNTIME):
+-  OPTS=['DIR:panda/src/audio', 'BUILDING:PANDA']
++  OPTS=['DIR:panda/src/audio', 'BUILDING:PANDA', 'STATICAUDIO']
++  if GetLinkAllStatic():
++      if not PkgSkip("OPENAL"):
++          DefSymbol("STATICAUDIO", "HAVE_OPENAL")
+   TargetAdd('p3audio_composite1.obj', opts=OPTS, input='p3audio_composite1.cxx')
  
-Index: panda/src/display/graphicsPipeSelection.cxx
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/panda/src/display/graphicsPipeSelection.cxx b/panda/src/display/graphicsPipeSelection.cxx
---- a/panda/src/display/graphicsPipeSelection.cxx	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/panda/src/display/graphicsPipeSelection.cxx	(date 1644109342417)
-@@ -22,6 +22,20 @@
+   OPTS=['DIR:panda/src/audio']
+@@ -4254,7 +4322,11 @@
+ #
  
- #include <algorithm>
+ if (not RUNTIME):
+-  OPTS=['DIR:panda/src/pgraph', 'BUILDING:PANDA']
++  if not PkgSkip("PANDATOOL") and not PkgSkip("EGG"):
++    DefSymbol("PYLOADER", "HAVE_PTLOADER")
++  if not PkgSkip("ASSIMP"):
++      DefSymbol("PYLOADER", "HAVE_ASSIMP")
++  OPTS=['DIR:panda/src/pgraph', 'BUILDING:PANDA', 'PYLOADER']
+   TargetAdd('p3pgraph_nodePath.obj', opts=OPTS, input='nodePath.cxx')
+   TargetAdd('p3pgraph_composite1.obj', opts=OPTS, input='p3pgraph_composite1.cxx')
+   TargetAdd('p3pgraph_composite2.obj', opts=OPTS, input='p3pgraph_composite2.cxx')
+@@ -4314,7 +4386,21 @@
+ #
  
-+#ifdef LINK_ALL_STATIC
+ if (not RUNTIME):
+-  OPTS=['DIR:panda/src/display', 'BUILDING:PANDA', 'X11']
++  deps = []
++  # display needs to link in a renderer when building statically for python, so tell it what is available.
++  if GetLinkAllStatic():
++    deps = ['dtool_have_gl.dat', 'dtool_have_tinydisplay.dat', 'dtool_have_egg.dat']
++    if not PkgSkip("GL"):
++      DefSymbol("PYDISPLAY", "HAVE_GL")
++    if not PkgSkip("DX9"):
++      DefSymbol("PYDISPLAY", "HAVE_DX9")
++    if not PkgSkip("TINYDISPLAY"):
++      DefSymbol("PYDISPLAY", "HAVE_TINYDISPLAY")
++    if not PkgSkip("EGG"):
++      DefSymbol("PYDISPLAY", "HAVE_EGG")
++    if not PkgSkip("OPENAL"):
++      DefSymbol("PYDISPLAY", "HAVE_OPENAL")
++  OPTS=['DIR:panda/src/display', 'BUILDING:PANDA', 'X11', "PYDISPLAY"]
+   TargetAdd('p3display_graphicsStateGuardian.obj', opts=OPTS, input='graphicsStateGuardian.cxx')
+   TargetAdd('p3display_composite1.obj', opts=OPTS, input='p3display_composite1.cxx')
+   TargetAdd('p3display_composite2.obj', opts=OPTS, input='p3display_composite2.cxx')
+@@ -4324,7 +4410,7 @@
+   IGATEFILES.remove("renderBuffer.h")
+   TargetAdd('libp3display.in', opts=OPTS, input=IGATEFILES)
+   TargetAdd('libp3display.in', opts=['IMOD:panda3d.core', 'ILIB:libp3display', 'SRCDIR:panda/src/display'])
+-  PyTargetAdd('p3display_ext_composite.obj', opts=OPTS, input='p3display_ext_composite.cxx')
++  PyTargetAdd('p3display_ext_composite.obj', opts=OPTS, input='p3display_ext_composite.cxx', dep=deps)
+ 
+   if RTDIST and GetTarget() == 'darwin':
+     OPTS=['DIR:panda/src/display']
+@@ -4701,6 +4787,17 @@
+   PyTargetAdd('core.pyd', input='p3pgraph_ext_composite.obj')
+   PyTargetAdd('core.pyd', input='p3display_ext_composite.obj')
+ 
++  if GetLinkAllStatic() and not PkgSkip("GL"):
++    PyTargetAdd('core.pyd', input='libpandagl.dll')
++  if GetLinkAllStatic() and not PkgSkip("DX9"):
++    PyTargetAdd('core.pyd', input='libpandadx9.dll')
++  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
++    PyTargetAdd('core.pyd', input='libp3tinydisplay.dll')
++  if GetLinkAllStatic() and not PkgSkip("OPENAL"):
++    PyTargetAdd('core.pyd', input='libp3openal_audio.dll')
++  if GetLinkAllStatic() and not PkgSkip("EGG"):
++    PyTargetAdd('core.pyd', input='libpandaegg.dll')
 +
-+#if defined(HAVE_DX9)
-+extern "C" extern int get_pipe_type_pandadx9();
-+#endif
-+#if defined(HAVE_GL)
-+extern "C" extern int get_pipe_type_pandagl();
-+#endif
-+#if defined(HAVE_TINYDISPLAY)
-+extern "C" extern int get_pipe_type_p3tinydisplay();
-+#endif
-+
-+#endif
-+
- using std::string;
+   PyTargetAdd('core.pyd', input='core_module.obj')
+   if not GetLinkAllStatic() and GetTarget() != 'emscripten':
+      PyTargetAdd('core.pyd', input='libp3tinyxml.ilb')
+@@ -5496,6 +5593,12 @@
+   TargetAdd('pview_pview.obj', opts=OPTS, input='pview.cxx')
+   TargetAdd('pview.exe', input='pview_pview.obj')
+   TargetAdd('pview.exe', input='libp3framework.dll')
++  if GetLinkAllStatic() and not PkgSkip("GL"):
++    TargetAdd('pview.exe', input='libpandagl.dll')
++  if GetLinkAllStatic() and not PkgSkip("DX9"):
++    TargetAdd('pview.exe', input='libpandadx9.dll')
++  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
++    TargetAdd('pview.exe', input='libp3tinydisplay.dll')
+   if not PkgSkip("EGG"):
+     TargetAdd('pview.exe', input='libpandaegg.dll')
+   TargetAdd('pview.exe', input=COMMON_PANDA_LIBS)
+@@ -5760,8 +5863,7 @@
+   PyTargetAdd('p3dcparse.exe', input='dcparse_dcparse.obj')
+   PyTargetAdd('p3dcparse.exe', input='libp3direct.dll')
+   PyTargetAdd('p3dcparse.exe', input=COMMON_PANDA_LIBS)
+-  PyTargetAdd('p3dcparse.exe', input='libp3pystub.lib')
+-  PyTargetAdd('p3dcparse.exe', opts=['ADVAPI'])
++  PyTargetAdd('p3dcparse.exe', opts=['ADVAPI', 'VERSION', 'SHLWAPI'])
  
- GraphicsPipeSelection *GraphicsPipeSelection::_global_ptr = nullptr;
-@@ -391,8 +405,28 @@
-     return (*mi).second._default_pipe_type;
-   }
+ #
+ # DIRECTORY: direct/src/plugin/
+@@ -5965,7 +6067,6 @@
+   TargetAdd('panda3d.exe', input='libpandaexpress.dll')
+   TargetAdd('panda3d.exe', input='libp3dtoolconfig.dll')
+   TargetAdd('panda3d.exe', input='libp3dtool.dll')
+-  #TargetAdd('panda3d.exe', input='libp3pystub.lib')
+   TargetAdd('panda3d.exe', input='libp3tinyxml.ilb')
+   TargetAdd('panda3d.exe', opts=['NOICON', 'OPENSSL', 'ZLIB', 'WINGDI', 'WINUSER', 'WINSHELL', 'ADVAPI', 'WINSOCK2', 'WINOLE', 'CARBON'])
  
--  // We have not yet loaded this module.  Load it now.
-+  void *dso_symbol = nullptr;
-+  string symbol_name = "get_pipe_type_" + name;
-   Filename dlname = Filename::dso_filename("lib" + name + ".so");
-+
-+#ifdef LINK_ALL_STATIC
-+#if defined(HAVE_DX9)
-+  if (name == "pandadx9") {
-+    dso_symbol = get_pipe_type_pandadx9;
-+  }
-+#endif
-+#if defined(HAVE_GL)
-+  if (name == "pandagl") {
-+    dso_symbol = get_pipe_type_pandagl;
-+  }
-+#endif
-+#if defined(HAVE_TINYDISPLAY)
-+  if (name == "p3tinydisplay") {
-+    dso_symbol = get_pipe_type_p3tinydisplay;
-+  }
-+#endif
-+#else
-+  // We have not yet loaded this module.  Load it now.
-   display_cat.info()
-     << "loading display module: " << dlname.to_os_specific() << std::endl;
-   void *handle = load_dso(get_plugin_path().get_value(), dlname);
-@@ -405,8 +439,8 @@
+@@ -5979,7 +6080,6 @@
+     TargetAdd('Panda3D.app', input='libpandaexpress.dll')
+     TargetAdd('Panda3D.app', input='libp3dtoolconfig.dll')
+     TargetAdd('Panda3D.app', input='libp3dtool.dll')
+-    #TargetAdd('Panda3D.app', input='libp3pystub.lib')
+     TargetAdd('Panda3D.app', input='libp3tinyxml.ilb')
+     TargetAdd('Panda3D.app', input='panda3d_mac.plist', ipath=OPTS)
+     TargetAdd('Panda3D.app', input='models/plugin_images/panda3d.icns')
+@@ -5994,18 +6094,16 @@
+     TargetAdd('panda3dw.exe', input='libpandaexpress.dll')
+     TargetAdd('panda3dw.exe', input='libp3dtoolconfig.dll')
+     TargetAdd('panda3dw.exe', input='libp3dtool.dll')
+-    #TargetAdd('panda3dw.exe', input='libp3pystub.lib')
+     TargetAdd('panda3dw.exe', input='libp3tinyxml.ilb')
+     TargetAdd('panda3dw.exe', opts=['SUBSYSTEM:WINDOWS', 'OPENSSL', 'ZLIB', 'WINGDI', 'WINUSER', 'WINSHELL', 'ADVAPI', 'WINSOCK2', 'WINOLE', 'CARBON'])
  
-   // Now get the module's recommended pipe type.  This requires calling a
-   // specially-named function that should have been exported from the module.
--  string symbol_name = "get_pipe_type_" + name;
--  void *dso_symbol = get_dso_symbol(handle, symbol_name);
-+  dso_symbol = get_dso_symbol(handle, symbol_name);
-+#endif
-   if (display_cat.is_debug()) {
-     display_cat.debug()
-       << "symbol of " << symbol_name << " = " << dso_symbol << "\n";
-@@ -451,10 +485,12 @@
-       << "\n";
-   }
+ if (RTDIST):
+-  OPTS=['BUILDING:P3D_PLUGIN', 'DIR:direct/src/plugin_standalone', 'DIR:direct/src/plugin', 'DIR:dtool/src/dtoolbase', 'DIR:dtool/src/dtoolutil', 'DIR:dtool/src/pystub', 'DIR:dtool/src/prc', 'DIR:dtool/src/dconfig', 'DIR:panda/src/express', 'DIR:panda/src/downloader', 'RUNTIME', 'P3DEMBED', 'OPENSSL', 'ZLIB']
++  OPTS=['BUILDING:P3D_PLUGIN', 'DIR:direct/src/plugin_standalone', 'DIR:direct/src/plugin', 'DIR:dtool/src/dtoolbase', 'DIR:dtool/src/dtoolutil', 'DIR:dtool/src/prc', 'DIR:dtool/src/dconfig', 'DIR:panda/src/express', 'DIR:panda/src/downloader', 'RUNTIME', 'P3DEMBED', 'OPENSSL', 'ZLIB']
+   # This is arguably a big fat ugly hack, but doing it otherwise would complicate the build process considerably.
+   DefSymbol("P3DEMBED", "LINK_ALL_STATIC", "")
+   TargetAdd('plugin_standalone_panda3dBase.obj', opts=OPTS, input='panda3dBase.cxx')
+   TargetAdd('plugin_standalone_p3dEmbedMain.obj', opts=OPTS, input='p3dEmbedMain.cxx')
+   TargetAdd('plugin_standalone_p3dEmbed.obj', opts=OPTS, input='p3dEmbed.cxx')
+-  #TargetAdd('plugin_standalone_pystub.obj', opts=OPTS, input='pystub.cxx')
+   TargetAdd('plugin_standalone_dtoolbase_composite1.obj', opts=OPTS, input='p3dtoolbase_composite1.cxx')
+   TargetAdd('plugin_standalone_dtoolbase_composite2.obj', opts=OPTS, input='p3dtoolbase_composite2.cxx')
+   TargetAdd('plugin_standalone_lookup3.obj', opts=OPTS, input='lookup3.c')
+@@ -6023,7 +6121,6 @@
+   TargetAdd('p3dembed.exe', input='plugin_standalone_panda3dBase.obj')
+   TargetAdd('p3dembed.exe', input='plugin_standalone_p3dEmbedMain.obj')
+   TargetAdd('p3dembed.exe', input='plugin_standalone_p3dEmbed.obj')
+-  #TargetAdd('p3dembed.exe', input='plugin_standalone_pystub.obj')
+   TargetAdd('p3dembed.exe', input='plugin_standalone_dtoolbase_composite1.obj')
+   TargetAdd('p3dembed.exe', input='plugin_standalone_dtoolbase_composite2.obj')
+   TargetAdd('p3dembed.exe', input='plugin_standalone_lookup3.obj')
+@@ -6053,7 +6150,6 @@
+     TargetAdd('p3dembedw.exe', input='plugin_standalone_panda3dBase.obj')
+     TargetAdd('p3dembedw.exe', input='plugin_standalone_p3dEmbedWinMain.obj')
+     TargetAdd('p3dembedw.exe', input='plugin_standalone_p3dEmbed.obj')
+-    #TargetAdd('p3dembedw.exe', input='plugin_standalone_pystub.obj')
+     TargetAdd('p3dembedw.exe', input='plugin_standalone_dtoolbase_composite1.obj')
+     TargetAdd('p3dembedw.exe', input='plugin_standalone_dtoolbase_composite2.obj')
+     TargetAdd('p3dembedw.exe', input='plugin_standalone_lookup3.obj')
+@@ -6495,7 +6591,19 @@
+   TargetAdd('pfm-trans.exe', input='pfm-trans_pfmTrans.obj')
+   TargetAdd('pfm-trans.exe', input='libp3progbase.lib')
+   TargetAdd('pfm-trans.exe', input='libp3pandatoolbase.lib')
++  if GetLinkAllStatic() and not PkgSkip("GL"):
++    TargetAdd('pfm-trans.exe', input='libpandagl.dll')
++  if GetLinkAllStatic() and not PkgSkip("DX9"):
++    TargetAdd('pfm-trans.exe', input='libpandadx9.dll')
++  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
++    TargetAdd('pfm-trans.exe', input='libp3tinydisplay.dll')
+   TargetAdd('pfm-trans.exe', input=COMMON_PANDA_LIBS)
++  if GetLinkAllStatic() and not PkgSkip("GL"):
++    TargetAdd('pfm-trans.exe', input='libpandagl.dll')
++  if GetLinkAllStatic() and not PkgSkip("DX9"):
++    TargetAdd('pfm-trans.exe', input='libpandadx9.dll')
++  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
++    TargetAdd('pfm-trans.exe', input='libp3tinydisplay.dll')
+   TargetAdd('pfm-trans.exe', opts=['ADVAPI'])
  
-+#if !defined(LINK_ALL_STATIC)
-   LoadedModule &module = _loaded_modules[name];
-   module._module_name = name;
-   module._module_handle = handle;
-   module._default_pipe_type = pipe_type;
-+#endif
+   TargetAdd('pfm-bba_pfmBba.obj', opts=OPTS, input='pfmBba.cxx')
+@@ -6833,8 +6941,6 @@
+     TargetAdd('mayaeggimport'+VNUM+'.mll', input='mayaeggimport'+VNUM+'_mayaeggimport.obj')
+     TargetAdd('mayaeggimport'+VNUM+'.mll', input='libpandaegg.dll')
+     TargetAdd('mayaeggimport'+VNUM+'.mll', input=COMMON_PANDA_LIBS)
+-    #if GetTarget() == 'windows':
+-    #  TargetAdd('mayaeggimport'+VNUM+'.mll', input='libp3pystub.lib')
+     TargetAdd('mayaeggimport'+VNUM+'.mll', opts=['ADVAPI', VER]+ARCH_OPTS)
  
-   return pipe_type;
- }
+     TargetAdd('mayaloader'+VNUM+'_config_mayaloader.obj', opts=OPTS, input='config_mayaloader.cxx')
+@@ -6971,7 +7077,7 @@
+ #
+ # DIRECTORY: pandatool/src/deploy-stub
+ #
+-if PkgSkip("PYTHON") == 0:
++if PkgSkip("PYTHON") == 0 and not GetLinkAllStatic():
+     OPTS=['DIR:pandatool/src/deploy-stub', 'BUILDING:DEPLOYSTUB']
+     PyTargetAdd('deploy-stub.obj', opts=OPTS, input='deploy-stub.c')
+     if GetTarget() == 'windows':
 Index: makepanda/makewheel.py
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/makepanda/makewheel.py b/makepanda/makewheel.py
---- a/makepanda/makewheel.py	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/makepanda/makewheel.py	(date 1644109342418)
+--- a/makepanda/makewheel.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/makepanda/makewheel.py	(date 1668276280505)
 @@ -15,7 +15,7 @@
  import subprocess
  from distutils.sysconfig import get_config_var
@@ -420,463 +915,137 @@ diff --git a/makepanda/makewheel.py b/makepanda/makewheel.py
      # And copy the extension modules from the Python installation into the
      # deploy_libs directory, for use by deploy-ng.
      ext_suffix = '.pyd' if sys.platform in ('win32', 'cygwin') else '.so'
-Index: makepanda/makepanda.py
+Index: panda/src/display/graphicsPipeSelection.cxx
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
---- a/makepanda/makepanda.py	(revision d66ef59ecc0ca1078e2dc9629984f9d08bfee806)
-+++ b/makepanda/makepanda.py	(date 1644117928501)
-@@ -7,6 +7,9 @@
- # panda3d.
- #
- ########################################################################
-+import json
-+import traceback
+diff --git a/panda/src/display/graphicsPipeSelection.cxx b/panda/src/display/graphicsPipeSelection.cxx
+--- a/panda/src/display/graphicsPipeSelection.cxx	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/panda/src/display/graphicsPipeSelection.cxx	(date 1668276280532)
+@@ -22,6 +22,20 @@
+ 
+ #include <algorithm>
+ 
++#ifdef LINK_ALL_STATIC
 +
- try:
-     import sys, os, platform, time, stat, re, getopt, threading, signal, shutil
-     if sys.platform == "darwin" or sys.version_info >= (2, 6):
-@@ -675,6 +678,9 @@
- IncDirectory("ALWAYS", GetOutputDir()+"/tmp")
- IncDirectory("ALWAYS", GetOutputDir()+"/include")
- 
-+if GetLinkAllStatic():
-+    DefSymbol("ALWAYS", "ALL_STATIC", "")
++#if defined(HAVE_DX9)
++extern "C" int get_pipe_type_pandadx9();
++#endif
++#if defined(HAVE_GL)
++extern "C" int get_pipe_type_pandagl();
++#endif
++#if defined(HAVE_TINYDISPLAY)
++extern "C" int get_pipe_type_p3tinydisplay();
++#endif
 +
- if (COMPILER == "MSVC"):
-     PkgDisable("X11")
-     PkgDisable("GLES")
-@@ -755,6 +761,8 @@
-     LibName("GLES2", "libGLESv2.lib")
-     LibName("EGL", "libEGL.lib")
-     LibName("MSIMG", "msimg32.lib")
-+    LibName("VERSION", "version.lib")
-+    LibName("SHLWAPI", "shlwapi.lib")
-     if (PkgSkip("DIRECTCAM")==0): LibName("DIRECTCAM", "strmiids.lib")
-     if (PkgSkip("DIRECTCAM")==0): LibName("DIRECTCAM", "quartz.lib")
-     if (PkgSkip("DIRECTCAM")==0): LibName("DIRECTCAM", "odbc32.lib")
-@@ -764,8 +772,10 @@
-             LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libpandassl.lib")
-             LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libpandaeay.lib")
-         else:
--            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libeay32.lib")
--            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/ssleay32.lib")
-+            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libcrypto.lib")
-+            LibName("OPENSSL", GetThirdpartyDir() + "openssl/lib/libssl.lib")
-+            LibName("OPENSSL", "crypt32.lib")
-+            LibName("OPENSSL", "ws2_32.lib")
-     if (PkgSkip("PNG")==0):
-         if os.path.isfile(GetThirdpartyDir() + "png/lib/libpng16_static.lib"):
-             LibName("PNG", GetThirdpartyDir() + "png/lib/libpng16_static.lib")
-@@ -797,7 +807,11 @@
-         IncDirectory("OPENEXR", GetThirdpartyDir() + "openexr/include/OpenEXR")
-         IncDirectory("OPENEXR", GetThirdpartyDir() + "openexr/include/Imath")
-     if (PkgSkip("JPEG")==0):     LibName("JPEG",     GetThirdpartyDir() + "jpeg/lib/jpeg-static.lib")
--    if (PkgSkip("ZLIB")==0):     LibName("ZLIB",     GetThirdpartyDir() + "zlib/lib/zlibstatic.lib")
-+    if (PkgSkip("ZLIB")==0):
-+        if os.path.isfile(GetThirdpartyDir() + "zlib/lib/zlibstatic.lib"):
-+            LibName("ZLIB", GetThirdpartyDir() + "zlib/lib/zlibstatic.lib")
-+        else:
-+            LibName("ZLIB", GetThirdpartyDir() + "zlib/lib/zlib.lib")
-     if (PkgSkip("VRPN")==0):     LibName("VRPN",     GetThirdpartyDir() + "vrpn/lib/vrpn.lib")
-     if (PkgSkip("VRPN")==0):     LibName("VRPN",     GetThirdpartyDir() + "vrpn/lib/quat.lib")
-     if (PkgSkip("NVIDIACG")==0): LibName("CGGL",     GetThirdpartyDir() + "nvidiacg/lib/cgGL.lib")
-@@ -806,7 +820,7 @@
-     if (PkgSkip("FREETYPE")==0): LibName("FREETYPE", GetThirdpartyDir() + "freetype/lib/freetype.lib")
-     if (PkgSkip("HARFBUZZ")==0):
-         LibName("HARFBUZZ", GetThirdpartyDir() + "harfbuzz/lib/harfbuzz.lib")
--        IncDirectory("HARFBUZZ", GetThirdpartyDir() + "harfbuzz/include/harfbuzz")
-+        IncDirectory("HARFBUZZ", GetThirdpartyDir() + "harfbuzz/include")
-     if (PkgSkip("FFTW")==0):     LibName("FFTW",     GetThirdpartyDir() + "fftw/lib/fftw3.lib")
-     if (PkgSkip("ARTOOLKIT")==0):LibName("ARTOOLKIT",GetThirdpartyDir() + "artoolkit/lib/libAR.lib")
-     if (PkgSkip("OPENCV")==0):   LibName("OPENCV",   GetThirdpartyDir() + "opencv/lib/cv.lib")
-@@ -864,17 +878,21 @@
-         DefSymbol("WX",     "_UNICODE", "")
-         DefSymbol("WX",     "UNICODE", "")
-     if (PkgSkip("VORBIS")==0):
--        for lib in ('ogg', 'vorbis', 'vorbisfile'):
-+        for lib in ('vorbis', 'vorbisfile'):
-             path = GetThirdpartyDir() + "vorbis/lib/lib{0}_static.lib".format(lib)
-             if not os.path.isfile(path):
-                 path = GetThirdpartyDir() + "vorbis/lib/{0}.lib".format(lib)
-             LibName("VORBIS", path)
-+        path = GetThirdpartyDir() + "ogg/lib/libogg_static.lib".format(lib)
-+        if not os.path.isfile(path):
-+            path = GetThirdpartyDir() + "ogg/lib/ogg.lib".format(lib)
-+        LibName("VORBIS", path)
-     if (PkgSkip("OPUS")==0):
-         IncDirectory("OPUS", GetThirdpartyDir() + "opus/include/opus")
-         for lib in ('ogg', 'opus', 'opusfile'):
--            path = GetThirdpartyDir() + "opus/lib/lib{0}_static.lib".format(lib)
-+            path = GetThirdpartyDir() + "{0}/lib/lib{0}_static.lib".format(lib)
-             if not os.path.isfile(path):
--                path = GetThirdpartyDir() + "opus/lib/{0}.lib".format(lib)
-+                path = GetThirdpartyDir() + "{0}/lib/{0}.lib".format(lib)
-             LibName("OPUS", path)
-     for pkg in MAYAVERSIONS:
-         if (PkgSkip(pkg)==0):
-@@ -1380,12 +1398,20 @@
-                 if (opt=="ALWAYS") or (opt in opts): cmd += " /D" + var + "=" + val
-             if (opts.count('MSFORSCOPE')): cmd += ' /Zc:forScope-'
- 
--            if (optlevel==1): cmd += " /MDd /Zi /RTCs /GS"
--            if (optlevel==2): cmd += " /MDd /Zi"
--            if (optlevel==3): cmd += " /MD /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast"
--            if (optlevel==4):
--                cmd += " /MD /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL"
--                cmd += " /Oy /Zp16"      # jean-claude add /Zp16 insures correct static alignment for SSEx
-+            if GetLinkAllStatic():
-+                if (optlevel==1): cmd += " /MTd /Zi /RTCs /GS"
-+                if (optlevel==2): cmd += " /MTd /Zi"
-+                if (optlevel==3): cmd += " /MT /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast"
-+                if (optlevel==4):
-+                    cmd += " /MT /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL"
-+                    cmd += " /Oy /Zp16"      # jean-claude add /Zp16 insures correct static alignment for SSEx
-+            else:
-+                if (optlevel==1): cmd += " /MDd /Zi /RTCs /GS"
-+                if (optlevel==2): cmd += " /MDd /Zi"
-+                if (optlevel==3): cmd += " /MD /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast"
-+                if (optlevel==4):
-+                    cmd += " /MD /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL"
-+                    cmd += " /Oy /Zp16 "      # jean-claude add /Zp16 insures correct static alignment for SSEx
- 
-             cmd += " /Fd" + os.path.splitext(obj)[0] + ".pdb"
- 
-@@ -1854,6 +1880,31 @@
-             for x in obj:
-                 if not x.endswith('.lib'):
-                     cmd += ' ' + BracketNameWithQuotes(x)
-+            import __np__
-+            lib_set = set()
-+            lib_dir_set = set()
-+            for (opt, name) in LIBNAMES:
-+                if opt != "OPENSSL" and ((opt=="ALWAYS") or (opt in opts)):
-+                    abs_path = name.replace(GetThirdpartyDir(), __np__.getDependencyInstallDir() + "/")
-+                    lib_set.add(os.path.basename(abs_path).replace(".lib", ""))
-+                    lib_dir = os.path.dirname(abs_path)
-+                    if lib_dir:
-+                        lib_dir_set.add(lib_dir)
-+            for (opt, dir) in LIBDIRECTORIES:
-+                if (opt=="ALWAYS") or (opt in opts):
-+                    lib_dir_set.add(dir)
-+            for dependent_lib in obj:
-+                if dependent_lib.endswith('.lib'):
-+                    if os.path.exists(dependent_lib + ".link.json"):
-+                        with open(dependent_lib + ".link.json", 'r') as f:
-+                            link_data = json.load(f)
-+                        lib_set.update(link_data["libraries"])
-+                        lib_dir_set.update(link_data["library_dirs"])
-+                    lib_dir_set.add("lib")
-+                    lib_set.add(os.path.basename(dependent_lib).replace(".lib", ""))
-+            link_info = {"libraries": list(lib_set), "library_dirs": list(lib_dir_set)}
-+            with open(lib + ".link.json", 'w') as f:
-+                json.dump(link_info, f)
-             oscmd(cmd)
-         else:
-             # Choose Intel linker; from Jean-Claude
-@@ -1892,21 +1943,28 @@
-             cmd = "link /nologo "
-             if HasTargetArch():
-                 cmd += " /MACHINE:" + GetTargetArch().upper()
--            if ("MFC" not in opts):
-+            if not GetLinkAllStatic() and "MFC" not in opts:
-                 cmd += " /NOD:MFC90.LIB /NOD:MFC80.LIB /NOD:LIBCMT"
--            cmd += " /NOD:LIBCI.LIB /DEBUG"
--            cmd += " /nod:libc /nod:libcmtd /nod:atlthunk /nod:atls /nod:atlsd"
-             if (GetOrigExt(dll) != ".exe"): cmd += " /DLL"
-             optlevel = GetOptimizeOption(opts)
--            if (optlevel==1): cmd += " /MAP /MAPINFO:EXPORTS /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
--            if (optlevel==2): cmd += " /MAP:NUL /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
--            if (optlevel==3): cmd += " /MAP:NUL /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
--            if (optlevel==4): cmd += " /MAP:NUL /LTCG /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
--            if ("MFC" in opts):
-+            if (optlevel==1): cmd += " /MAP /MAPINFO:EXPORTS "
-+            if (optlevel==2): cmd += " /MAP:NUL "
-+            if (optlevel==3): cmd += " /MAP:NUL "
-+            if (optlevel==4): cmd += " /MAP:NUL /LTCG "
-+            if not GetLinkAllStatic() and "MFC" in opts:
-                 if (optlevel<=2): cmd += " /NOD:MSVCRTD.LIB mfcs100d.lib MSVCRTD.lib"
-                 else: cmd += " /NOD:MSVCRT.LIB mfcs100.lib MSVCRT.lib"
--            cmd += " /FIXED:NO /OPT:REF /STACK:4194304 /INCREMENTAL:NO "
-+            cmd += " /FIXED:NO /OPT:REF /STACK:4194304 "
-             cmd += ' /OUT:' + BracketNameWithQuotes(dll)
-+            if not GetLinkAllStatic():
-+                cmd += " /NOD:LIBCI.LIB /DEBUG"
-+                cmd += " /nod:libc /nod:libcmtd /nod:atlthunk /nod:atls /nod:atlsd"
-+                if (optlevel==1): cmd += " /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
-+                if (optlevel==2): cmd += " /NOD:MSVCRT.LIB /NOD:MSVCPRT.LIB /NOD:MSVCIRT.LIB"
-+                if (optlevel==3): cmd += " /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
-+                if (optlevel==4): cmd += " /NOD:MSVCRTD.LIB /NOD:MSVCPRTD.LIB /NOD:MSVCIRTD.LIB"
-+                cmd += " /INCREMENTAL:NO"
++#endif
 +
+ using std::string;
  
-             if not PkgSkip("PYTHON"):
-                 # If we're building without Python, don't pick it up implicitly.
-@@ -1917,12 +1975,6 @@
-                     else:
-                         cmd += ' /NOD:{}.lib'.format(pythonv)
+ GraphicsPipeSelection *GraphicsPipeSelection::_global_ptr = nullptr;
+@@ -391,8 +405,28 @@
+     return (*mi).second._default_pipe_type;
+   }
  
--                # Yes, we know we are importing "locally defined symbols".
--                for x in obj:
--                    if x.endswith('libp3pystub.lib'):
--                        cmd += ' /ignore:4049,4217'
--                        break
--
-             # Set the subsystem.  Specify that we want to target Windows XP.
-             subsystem = GetValueOption(opts, "SUBSYSTEM:") or "CONSOLE"
-             cmd += " /SUBSYSTEM:" + subsystem
-@@ -3279,19 +3331,19 @@
-     if not PkgSkip("FMODEX"):
-         configprc = configprc.replace("p3openal_audio", "p3fmod_audio")
- 
--if PkgSkip("GL") or GetLinkAllStatic():
-+if PkgSkip("GL"):
-     configprc = configprc.replace("\nload-display pandagl", "\n#load-display pandagl")
- 
- if PkgSkip("GLES") or GetLinkAllStatic():
-     configprc = configprc.replace("\n#load-display pandagles", "")
- 
--if PkgSkip("DX9") or GetLinkAllStatic():
-+if PkgSkip("DX9"):
-     configprc = configprc.replace("\n#load-display pandadx9", "")
- 
- if PkgSkip("TINYDISPLAY") or GetLinkAllStatic():
-     configprc = configprc.replace("\n#load-display p3tinydisplay", "")
- 
--if PkgSkip("OPENAL") or GetLinkAllStatic():
-+if PkgSkip("OPENAL"):
-     configprc = configprc.replace("audio-library-name p3openal_audio", "#audio-library-name p3openal_audio")
- 
- if GetTarget() == 'windows':
-@@ -3408,13 +3460,14 @@
-             CopyAllFiles(GetOutputDir() + "/bin/", tp_dir + "extras/bin/")
- 
-         if not PkgSkip("PYTHON") and not RTDIST:
--            # We need to copy the Python DLL to the bin directory for now.
--            pydll = "/" + SDK["PYTHONVERSION"].replace(".", "")
--            if GetOptimize() <= 2:
--                pydll += "_d.dll"
--            else:
--                pydll += ".dll"
--            CopyFile(GetOutputDir() + "/bin" + pydll, SDK["PYTHON"] + pydll)
-+            if not GetLinkAllStatic():
-+                # We need to copy the Python DLL to the bin directory for now.
-+                pydll = "/" + SDK["PYTHONVERSION"].replace(".", "")
-+                if GetOptimize() <= 2:
-+                    pydll += "_d.dll"
-+                else:
-+                    pydll += ".dll"
-+                CopyFile(GetOutputDir() + "/bin" + pydll, SDK["PYTHON"] + pydll)
- 
-             for fn in glob.glob(SDK["PYTHON"] + "/vcruntime*.dll"):
-                 CopyFile(GetOutputDir() + "/bin/", fn)
-@@ -3534,7 +3587,6 @@
- CopyAllHeaders('dtool/src/dconfig')
- CopyAllHeaders('dtool/src/interrogatedb')
- CopyAllHeaders('dtool/metalibs/dtoolconfig')
--CopyAllHeaders('dtool/src/pystub')
- CopyAllHeaders('dtool/src/interrogate')
- CopyAllHeaders('dtool/src/test_interrogate')
- CopyAllHeaders('panda/src/putil')
-@@ -3730,6 +3782,13 @@
-     'libpandaegg.dll',
- ] + COMMON_PANDA_LIBS
- 
-+if GetLinkAllStatic() and not PkgSkip("GL"):
-+    COMMON_EGG2X_LIBS+=['libpandagl.dll']
-+if GetLinkAllStatic() and not PkgSkip("DX9"):
-+    COMMON_EGG2X_LIBS+=['libpandadx9.dll']
-+if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
-+    COMMON_EGG2X_LIBS+=['libp3tinydisplay.dll']
+-  // We have not yet loaded this module.  Load it now.
++  void *dso_symbol = nullptr;
++  string symbol_name = "get_pipe_type_" + name;
+   Filename dlname = Filename::dso_filename("lib" + name + ".so");
 +
- ########################################################################
- #
- # This section contains a list of all the files that need to be compiled.
-@@ -3842,17 +3901,6 @@
- PyTargetAdd('interrogatedb.pyd', input='libp3dtoolconfig.dll')
- PyTargetAdd('interrogatedb.pyd', input='libp3interrogatedb.dll')
++#ifdef LINK_ALL_STATIC
++#if defined(HAVE_DX9)
++  if (name == "pandadx9") {
++    dso_symbol = (void*)get_pipe_type_pandadx9;
++  }
++#endif
++#if defined(HAVE_GL)
++  if (name == "pandagl") {
++    dso_symbol = (void*)get_pipe_type_pandagl;
++  }
++#endif
++#if defined(HAVE_TINYDISPLAY)
++  if (name == "p3tinydisplay") {
++    dso_symbol = (void*)get_pipe_type_p3tinydisplay;
++  }
++#endif
++#else
++  // We have not yet loaded this module.  Load it now.
+   display_cat.info()
+     << "loading display module: " << dlname.to_os_specific() << std::endl;
+   void *handle = load_dso(get_plugin_path().get_value(), dlname);
+@@ -405,8 +439,8 @@
  
--#
--# DIRECTORY: dtool/src/pystub/
--#
--
--if not RUNTIME and not RTDIST:
--  OPTS=['DIR:dtool/src/pystub']
--  TargetAdd('p3pystub_pystub.obj', opts=OPTS, input='pystub.cxx')
--  TargetAdd('libp3pystub.lib', input='p3pystub_pystub.obj')
--  #TargetAdd('libp3pystub.lib', input='libp3dtool.dll')
--  TargetAdd('libp3pystub.lib', opts=['ADVAPI'])
--
- #
- # DIRECTORY: dtool/src/interrogate/
- #
-@@ -4073,7 +4121,10 @@
- #
+   // Now get the module's recommended pipe type.  This requires calling a
+   // specially-named function that should have been exported from the module.
+-  string symbol_name = "get_pipe_type_" + name;
+-  void *dso_symbol = get_dso_symbol(handle, symbol_name);
++  dso_symbol = get_dso_symbol(handle, symbol_name);
++#endif
+   if (display_cat.is_debug()) {
+     display_cat.debug()
+       << "symbol of " << symbol_name << " = " << dso_symbol << "\n";
+@@ -451,10 +485,12 @@
+       << "\n";
+   }
  
- if (not RUNTIME):
--  OPTS=['DIR:panda/src/audio', 'BUILDING:PANDA']
-+  OPTS=['DIR:panda/src/audio', 'BUILDING:PANDA', 'STATICAUDIO']
-+  if GetLinkAllStatic():
-+      if not PkgSkip("OPENAL"):
-+          DefSymbol("STATICAUDIO", "HAVE_OPENAL")
-   TargetAdd('p3audio_composite1.obj', opts=OPTS, input='p3audio_composite1.cxx')
++#if !defined(LINK_ALL_STATIC)
+   LoadedModule &module = _loaded_modules[name];
+   module._module_name = name;
+   module._module_handle = handle;
+   module._default_pipe_type = pipe_type;
++#endif
  
-   OPTS=['DIR:panda/src/audio']
-@@ -4281,7 +4332,21 @@
- #
+   return pipe_type;
+ }
+Index: direct/src/showbase/ShowBase.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/direct/src/showbase/ShowBase.py b/direct/src/showbase/ShowBase.py
+--- a/direct/src/showbase/ShowBase.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/direct/src/showbase/ShowBase.py	(date 1668276280046)
+@@ -647,7 +647,7 @@
+         selection = GraphicsPipeSelection.getGlobalPtr()
+         if printPipeTypes:
+             selection.printPipeTypes()
+-        self.pipe = selection.makeDefaultPipe()
++        self.pipe = selection.makeModulePipe(ConfigVariableString("load-display").value)
+         if not self.pipe:
+             self.notify.error(
+                 "No graphics pipe is available!\n"
+Index: dtool/src/dtoolutil/executionEnvironment.cxx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/dtool/src/dtoolutil/executionEnvironment.cxx b/dtool/src/dtoolutil/executionEnvironment.cxx
+--- a/dtool/src/dtoolutil/executionEnvironment.cxx	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/dtool/src/dtoolutil/executionEnvironment.cxx	(date 1668276280076)
+@@ -453,7 +453,7 @@
+ string ExecutionEnvironment::
+ ns_get_dtool_name() const {
+   if (_dtool_name.empty()) {
+-    return "unknown";
++    return ns_get_binary_name();
+   }
+   return _dtool_name;
+ }
+Index: makepanda/makepackage.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/makepanda/makepackage.py b/makepanda/makepackage.py
+--- a/makepanda/makepackage.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
++++ b/makepanda/makepackage.py	(date 1668276280114)
+@@ -614,8 +614,6 @@
  
- if (not RUNTIME):
--  OPTS=['DIR:panda/src/display', 'BUILDING:PANDA', 'X11']
-+  deps = []
-+  # display needs to link in a renderer when building statically for python, so tell it what is available.
-+  if GetLinkAllStatic():
-+    deps = ['dtool_have_gl.dat', 'dtool_have_tinydisplay.dat', 'dtool_have_egg.dat']
-+    if not PkgSkip("GL"):
-+      DefSymbol("PYDISPLAY", "HAVE_GL")
-+    if not PkgSkip("DX9"):
-+      DefSymbol("PYDISPLAY", "HAVE_DX9")
-+    if not PkgSkip("TINYDISPLAY"):
-+      DefSymbol("PYDISPLAY", "HAVE_TINYDISPLAY")
-+    if not PkgSkip("EGG"):
-+      DefSymbol("PYDISPLAY", "HAVE_EGG")
-+    if not PkgSkip("OPENAL"):
-+      DefSymbol("PYDISPLAY", "HAVE_OPENAL")
-+  OPTS=['DIR:panda/src/display', 'BUILDING:PANDA', 'X11', "PYDISPLAY"]
-   TargetAdd('p3display_graphicsStateGuardian.obj', opts=OPTS, input='graphicsStateGuardian.cxx')
-   TargetAdd('p3display_composite1.obj', opts=OPTS, input='p3display_composite1.cxx')
-   TargetAdd('p3display_composite2.obj', opts=OPTS, input='p3display_composite2.cxx')
-@@ -4291,7 +4356,7 @@
-   IGATEFILES.remove("renderBuffer.h")
-   TargetAdd('libp3display.in', opts=OPTS, input=IGATEFILES)
-   TargetAdd('libp3display.in', opts=['IMOD:panda3d.core', 'ILIB:libp3display', 'SRCDIR:panda/src/display'])
--  PyTargetAdd('p3display_ext_composite.obj', opts=OPTS, input='p3display_ext_composite.cxx')
-+  PyTargetAdd('p3display_ext_composite.obj', opts=OPTS, input='p3display_ext_composite.cxx', dep=deps)
+     oscmd("mkdir -p dstroot/headers/%s/lib" % installdir)
+     oscmd("cp -R %s/include               dstroot/headers/%s/include" % (outputdir, installdir))
+-    if os.path.isfile(outputdir + "/lib/libp3pystub.a"):
+-        oscmd("cp -R -P %s/lib/libp3pystub.a dstroot/headers/%s/lib/" % (outputdir, installdir))
  
-   if RTDIST and GetTarget() == 'darwin':
-     OPTS=['DIR:panda/src/display']
-@@ -4668,6 +4733,17 @@
-   PyTargetAdd('core.pyd', input='p3pgraph_ext_composite.obj')
-   PyTargetAdd('core.pyd', input='p3display_ext_composite.obj')
- 
-+  if GetLinkAllStatic() and not PkgSkip("GL"):
-+    PyTargetAdd('core.pyd', input='libpandagl.dll')
-+  if GetLinkAllStatic() and not PkgSkip("DX9"):
-+    PyTargetAdd('core.pyd', input='libpandadx9.dll')
-+  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
-+    PyTargetAdd('core.pyd', input='libp3tinydisplay.dll')
-+  if GetLinkAllStatic() and not PkgSkip("OPENAL"):
-+    PyTargetAdd('core.pyd', input='libp3openal_audio.dll')
-+  if GetLinkAllStatic() and not PkgSkip("EGG"):
-+    PyTargetAdd('core.pyd', input='libpandaegg.dll')
-+
-   PyTargetAdd('core.pyd', input='core_module.obj')
-   if not GetLinkAllStatic() and GetTarget() != 'emscripten':
-      PyTargetAdd('core.pyd', input='libp3tinyxml.ilb')
-@@ -5463,6 +5539,12 @@
-   TargetAdd('pview_pview.obj', opts=OPTS, input='pview.cxx')
-   TargetAdd('pview.exe', input='pview_pview.obj')
-   TargetAdd('pview.exe', input='libp3framework.dll')
-+  if GetLinkAllStatic() and not PkgSkip("GL"):
-+    TargetAdd('pview.exe', input='libpandagl.dll')
-+  if GetLinkAllStatic() and not PkgSkip("DX9"):
-+    TargetAdd('pview.exe', input='libpandadx9.dll')
-+  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
-+    TargetAdd('pview.exe', input='libp3tinydisplay.dll')
-   if not PkgSkip("EGG"):
-     TargetAdd('pview.exe', input='libpandaegg.dll')
-   TargetAdd('pview.exe', input=COMMON_PANDA_LIBS)
-@@ -5725,8 +5807,7 @@
-   PyTargetAdd('p3dcparse.exe', input='dcparse_dcparse.obj')
-   PyTargetAdd('p3dcparse.exe', input='libp3direct.dll')
-   PyTargetAdd('p3dcparse.exe', input=COMMON_PANDA_LIBS)
--  PyTargetAdd('p3dcparse.exe', input='libp3pystub.lib')
--  PyTargetAdd('p3dcparse.exe', opts=['ADVAPI'])
-+  PyTargetAdd('p3dcparse.exe', opts=['ADVAPI', 'VERSION', 'SHLWAPI'])
- 
- #
- # DIRECTORY: direct/src/plugin/
-@@ -5930,7 +6011,6 @@
-   TargetAdd('panda3d.exe', input='libpandaexpress.dll')
-   TargetAdd('panda3d.exe', input='libp3dtoolconfig.dll')
-   TargetAdd('panda3d.exe', input='libp3dtool.dll')
--  #TargetAdd('panda3d.exe', input='libp3pystub.lib')
-   TargetAdd('panda3d.exe', input='libp3tinyxml.ilb')
-   TargetAdd('panda3d.exe', opts=['NOICON', 'OPENSSL', 'ZLIB', 'WINGDI', 'WINUSER', 'WINSHELL', 'ADVAPI', 'WINSOCK2', 'WINOLE', 'CARBON'])
- 
-@@ -5944,7 +6024,6 @@
-     TargetAdd('Panda3D.app', input='libpandaexpress.dll')
-     TargetAdd('Panda3D.app', input='libp3dtoolconfig.dll')
-     TargetAdd('Panda3D.app', input='libp3dtool.dll')
--    #TargetAdd('Panda3D.app', input='libp3pystub.lib')
-     TargetAdd('Panda3D.app', input='libp3tinyxml.ilb')
-     TargetAdd('Panda3D.app', input='panda3d_mac.plist', ipath=OPTS)
-     TargetAdd('Panda3D.app', input='models/plugin_images/panda3d.icns')
-@@ -5959,18 +6038,16 @@
-     TargetAdd('panda3dw.exe', input='libpandaexpress.dll')
-     TargetAdd('panda3dw.exe', input='libp3dtoolconfig.dll')
-     TargetAdd('panda3dw.exe', input='libp3dtool.dll')
--    #TargetAdd('panda3dw.exe', input='libp3pystub.lib')
-     TargetAdd('panda3dw.exe', input='libp3tinyxml.ilb')
-     TargetAdd('panda3dw.exe', opts=['SUBSYSTEM:WINDOWS', 'OPENSSL', 'ZLIB', 'WINGDI', 'WINUSER', 'WINSHELL', 'ADVAPI', 'WINSOCK2', 'WINOLE', 'CARBON'])
- 
- if (RTDIST):
--  OPTS=['BUILDING:P3D_PLUGIN', 'DIR:direct/src/plugin_standalone', 'DIR:direct/src/plugin', 'DIR:dtool/src/dtoolbase', 'DIR:dtool/src/dtoolutil', 'DIR:dtool/src/pystub', 'DIR:dtool/src/prc', 'DIR:dtool/src/dconfig', 'DIR:panda/src/express', 'DIR:panda/src/downloader', 'RUNTIME', 'P3DEMBED', 'OPENSSL', 'ZLIB']
-+  OPTS=['BUILDING:P3D_PLUGIN', 'DIR:direct/src/plugin_standalone', 'DIR:direct/src/plugin', 'DIR:dtool/src/dtoolbase', 'DIR:dtool/src/dtoolutil', 'DIR:dtool/src/prc', 'DIR:dtool/src/dconfig', 'DIR:panda/src/express', 'DIR:panda/src/downloader', 'RUNTIME', 'P3DEMBED', 'OPENSSL', 'ZLIB']
-   # This is arguably a big fat ugly hack, but doing it otherwise would complicate the build process considerably.
-   DefSymbol("P3DEMBED", "LINK_ALL_STATIC", "")
-   TargetAdd('plugin_standalone_panda3dBase.obj', opts=OPTS, input='panda3dBase.cxx')
-   TargetAdd('plugin_standalone_p3dEmbedMain.obj', opts=OPTS, input='p3dEmbedMain.cxx')
-   TargetAdd('plugin_standalone_p3dEmbed.obj', opts=OPTS, input='p3dEmbed.cxx')
--  #TargetAdd('plugin_standalone_pystub.obj', opts=OPTS, input='pystub.cxx')
-   TargetAdd('plugin_standalone_dtoolbase_composite1.obj', opts=OPTS, input='p3dtoolbase_composite1.cxx')
-   TargetAdd('plugin_standalone_dtoolbase_composite2.obj', opts=OPTS, input='p3dtoolbase_composite2.cxx')
-   TargetAdd('plugin_standalone_lookup3.obj', opts=OPTS, input='lookup3.c')
-@@ -5988,7 +6065,6 @@
-   TargetAdd('p3dembed.exe', input='plugin_standalone_panda3dBase.obj')
-   TargetAdd('p3dembed.exe', input='plugin_standalone_p3dEmbedMain.obj')
-   TargetAdd('p3dembed.exe', input='plugin_standalone_p3dEmbed.obj')
--  #TargetAdd('p3dembed.exe', input='plugin_standalone_pystub.obj')
-   TargetAdd('p3dembed.exe', input='plugin_standalone_dtoolbase_composite1.obj')
-   TargetAdd('p3dembed.exe', input='plugin_standalone_dtoolbase_composite2.obj')
-   TargetAdd('p3dembed.exe', input='plugin_standalone_lookup3.obj')
-@@ -6018,7 +6094,6 @@
-     TargetAdd('p3dembedw.exe', input='plugin_standalone_panda3dBase.obj')
-     TargetAdd('p3dembedw.exe', input='plugin_standalone_p3dEmbedWinMain.obj')
-     TargetAdd('p3dembedw.exe', input='plugin_standalone_p3dEmbed.obj')
--    #TargetAdd('p3dembedw.exe', input='plugin_standalone_pystub.obj')
-     TargetAdd('p3dembedw.exe', input='plugin_standalone_dtoolbase_composite1.obj')
-     TargetAdd('p3dembedw.exe', input='plugin_standalone_dtoolbase_composite2.obj')
-     TargetAdd('p3dembedw.exe', input='plugin_standalone_lookup3.obj')
-@@ -6460,6 +6535,12 @@
-   TargetAdd('pfm-trans.exe', input='pfm-trans_pfmTrans.obj')
-   TargetAdd('pfm-trans.exe', input='libp3progbase.lib')
-   TargetAdd('pfm-trans.exe', input='libp3pandatoolbase.lib')
-+  if GetLinkAllStatic() and not PkgSkip("GL"):
-+    TargetAdd('pfm-trans.exe', input='libpandagl.dll')
-+  if GetLinkAllStatic() and not PkgSkip("DX9"):
-+    TargetAdd('pfm-trans.exe', input='libpandadx9.dll')
-+  if GetLinkAllStatic() and not PkgSkip("TINYDISPLAY"):
-+    TargetAdd('pfm-trans.exe', input='libp3tinydisplay.dll')
-   TargetAdd('pfm-trans.exe', input=COMMON_PANDA_LIBS)
-   TargetAdd('pfm-trans.exe', opts=['ADVAPI'])
- 
-@@ -6798,8 +6879,6 @@
-     TargetAdd('mayaeggimport'+VNUM+'.mll', input='mayaeggimport'+VNUM+'_mayaeggimport.obj')
-     TargetAdd('mayaeggimport'+VNUM+'.mll', input='libpandaegg.dll')
-     TargetAdd('mayaeggimport'+VNUM+'.mll', input=COMMON_PANDA_LIBS)
--    #if GetTarget() == 'windows':
--    #  TargetAdd('mayaeggimport'+VNUM+'.mll', input='libp3pystub.lib')
-     TargetAdd('mayaeggimport'+VNUM+'.mll', opts=['ADVAPI', VER]+ARCH_OPTS)
- 
-     TargetAdd('mayaloader'+VNUM+'_config_mayaloader.obj', opts=OPTS, input='config_mayaloader.cxx')
-@@ -6936,7 +7015,7 @@
- #
- # DIRECTORY: pandatool/src/deploy-stub
- #
--if PkgSkip("PYTHON") == 0:
-+if PkgSkip("PYTHON") == 0 and not GetLinkAllStatic():
-     OPTS=['DIR:pandatool/src/deploy-stub', 'BUILDING:DEPLOYSTUB']
-     PyTargetAdd('deploy-stub.obj', opts=OPTS, input='deploy-stub.c')
-     if GetTarget() == 'windows':
+     if os.path.isdir("samples"):
+         oscmd("mkdir -p dstroot/samples/%s/samples" % installdir)
