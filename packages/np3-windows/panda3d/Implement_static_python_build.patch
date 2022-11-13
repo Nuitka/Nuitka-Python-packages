@@ -327,7 +327,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
 --- a/makepanda/makepanda.py	(revision 50a34900c3d2cca150361e4e43393c1dce08a192)
-+++ b/makepanda/makepanda.py	(date 1668276312408)
++++ b/makepanda/makepanda.py	(date 1668288465958)
 @@ -7,6 +7,9 @@
  # panda3d.
  #
@@ -476,29 +476,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
              oscmd(cmd)
          else:
              # Choose Intel linker; from Jean-Claude
-@@ -1913,6 +1964,21 @@
- 
-         oscmd(GetRanlib() + ' ' + BracketNameWithQuotes(lib))
- 
-+        link_data = {
-+            "libraries": [x[1][2:] for x in LIBNAMES if x[0] in opts and x[1].startswith('-l')] +
-+                         [os.path.splitext(os.path.basename(x[1]))[0][3 if os.path.basename(x[1]).startswith('lib') else 0:] for x in LIBNAMES if x[0] in opts and ('.so' in x[1] or '.dylib' in x[1]) and not x[1].startswith('-dylib')],
-+            "library_dirs": [], "runtime_library_dirs": [],
-+            "extra_postargs": ["-framework", "IOKit", "-framework", "CoreAudio", "-framework", "CoreVideo"] +
-+                              [y for x in LIBNAMES if x[0] in opts and x[1].startswith('-framework') for y in
-+                               x[1].split(" ")]
-+        }
-+        if "NVIDIACG" in opts:
-+            import __np__
-+            link_data["library_dirs"].append(os.path.join(__np__.find_dep_root("nvidiacg"), "lib"))
-+        import json
-+        with open(lib + '.link.json', 'w') as f:
-+            f.write(json.dumps(link_data))
-+
- ########################################################################
- ##
- ## CompileLink
-@@ -1925,21 +1991,28 @@
+@@ -1925,21 +1976,28 @@
              cmd = "link /nologo "
              if HasTargetArch():
                  cmd += " /MACHINE:" + GetTargetArch().upper()
@@ -536,7 +514,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  
              if not PkgSkip("PYTHON"):
                  # If we're building without Python, don't pick it up implicitly.
-@@ -1950,12 +2023,6 @@
+@@ -1950,12 +2008,6 @@
                      else:
                          cmd += ' /NOD:{}.lib'.format(pythonv)
  
@@ -549,7 +527,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
              # Set the subsystem.  Specify that we want to target Windows XP.
              subsystem = GetValueOption(opts, "SUBSYSTEM:") or "CONSOLE"
              cmd += " /SUBSYSTEM:" + subsystem
-@@ -2146,6 +2213,8 @@
+@@ -2146,6 +2198,8 @@
          if GetTarget() != 'freebsd':
              cmd += " -ldl"
  
@@ -558,7 +536,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
          oscmd(cmd)
  
          if GetOptimizeOption(opts) == 4 and GetTarget() in ('linux', 'android'):
-@@ -3284,7 +3353,7 @@
+@@ -3284,7 +3338,7 @@
  if PkgSkip("EGG") or GetLinkAllStatic():
      confautoprc = confautoprc.replace("load-file-type egg pandaegg", "#load-file-type egg pandaegg")
  
@@ -567,7 +545,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
      confautoprc = confautoprc.replace("load-file-type p3ptloader", "#load-file-type p3ptloader")
  
  if PkgSkip("FFMPEG") or GetLinkAllStatic():
-@@ -3312,19 +3381,19 @@
+@@ -3312,19 +3366,19 @@
      if not PkgSkip("FMODEX"):
          configprc = configprc.replace("p3openal_audio", "p3fmod_audio")
  
@@ -590,7 +568,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
      configprc = configprc.replace("audio-library-name p3openal_audio", "#audio-library-name p3openal_audio")
  
  if GetTarget() == 'windows':
-@@ -3441,13 +3510,14 @@
+@@ -3441,13 +3495,14 @@
              CopyAllFiles(GetOutputDir() + "/bin/", tp_dir + "extras/bin/")
  
          if not PkgSkip("PYTHON") and not RTDIST:
@@ -612,7 +590,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  
              for fn in glob.glob(SDK["PYTHON"] + "/vcruntime*.dll"):
                  CopyFile(GetOutputDir() + "/bin/", fn)
-@@ -3567,7 +3637,6 @@
+@@ -3567,7 +3622,6 @@
  CopyAllHeaders('dtool/src/dconfig')
  CopyAllHeaders('dtool/src/interrogatedb')
  CopyAllHeaders('dtool/metalibs/dtoolconfig')
@@ -620,7 +598,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  CopyAllHeaders('dtool/src/interrogate')
  CopyAllHeaders('dtool/src/test_interrogate')
  CopyAllHeaders('panda/src/putil')
-@@ -3763,6 +3832,13 @@
+@@ -3763,6 +3817,13 @@
      'libpandaegg.dll',
  ] + COMMON_PANDA_LIBS
  
@@ -634,7 +612,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  ########################################################################
  #
  # This section contains a list of all the files that need to be compiled.
-@@ -3875,17 +3951,6 @@
+@@ -3875,17 +3936,6 @@
  PyTargetAdd('interrogatedb.pyd', input='libp3dtoolconfig.dll')
  PyTargetAdd('interrogatedb.pyd', input='libp3interrogatedb.dll')
  
@@ -652,7 +630,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  #
  # DIRECTORY: dtool/src/interrogate/
  #
-@@ -4106,7 +4171,10 @@
+@@ -4106,7 +4156,10 @@
  #
  
  if (not RUNTIME):
@@ -664,7 +642,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('p3audio_composite1.obj', opts=OPTS, input='p3audio_composite1.cxx')
  
    OPTS=['DIR:panda/src/audio']
-@@ -4254,7 +4322,11 @@
+@@ -4254,7 +4307,11 @@
  #
  
  if (not RUNTIME):
@@ -677,7 +655,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('p3pgraph_nodePath.obj', opts=OPTS, input='nodePath.cxx')
    TargetAdd('p3pgraph_composite1.obj', opts=OPTS, input='p3pgraph_composite1.cxx')
    TargetAdd('p3pgraph_composite2.obj', opts=OPTS, input='p3pgraph_composite2.cxx')
-@@ -4314,7 +4386,21 @@
+@@ -4314,7 +4371,21 @@
  #
  
  if (not RUNTIME):
@@ -700,7 +678,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('p3display_graphicsStateGuardian.obj', opts=OPTS, input='graphicsStateGuardian.cxx')
    TargetAdd('p3display_composite1.obj', opts=OPTS, input='p3display_composite1.cxx')
    TargetAdd('p3display_composite2.obj', opts=OPTS, input='p3display_composite2.cxx')
-@@ -4324,7 +4410,7 @@
+@@ -4324,7 +4395,7 @@
    IGATEFILES.remove("renderBuffer.h")
    TargetAdd('libp3display.in', opts=OPTS, input=IGATEFILES)
    TargetAdd('libp3display.in', opts=['IMOD:panda3d.core', 'ILIB:libp3display', 'SRCDIR:panda/src/display'])
@@ -709,7 +687,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  
    if RTDIST and GetTarget() == 'darwin':
      OPTS=['DIR:panda/src/display']
-@@ -4701,6 +4787,17 @@
+@@ -4701,6 +4772,17 @@
    PyTargetAdd('core.pyd', input='p3pgraph_ext_composite.obj')
    PyTargetAdd('core.pyd', input='p3display_ext_composite.obj')
  
@@ -727,7 +705,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    PyTargetAdd('core.pyd', input='core_module.obj')
    if not GetLinkAllStatic() and GetTarget() != 'emscripten':
       PyTargetAdd('core.pyd', input='libp3tinyxml.ilb')
-@@ -5496,6 +5593,12 @@
+@@ -5496,6 +5578,12 @@
    TargetAdd('pview_pview.obj', opts=OPTS, input='pview.cxx')
    TargetAdd('pview.exe', input='pview_pview.obj')
    TargetAdd('pview.exe', input='libp3framework.dll')
@@ -740,7 +718,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    if not PkgSkip("EGG"):
      TargetAdd('pview.exe', input='libpandaegg.dll')
    TargetAdd('pview.exe', input=COMMON_PANDA_LIBS)
-@@ -5760,8 +5863,7 @@
+@@ -5760,8 +5848,7 @@
    PyTargetAdd('p3dcparse.exe', input='dcparse_dcparse.obj')
    PyTargetAdd('p3dcparse.exe', input='libp3direct.dll')
    PyTargetAdd('p3dcparse.exe', input=COMMON_PANDA_LIBS)
@@ -750,7 +728,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
  
  #
  # DIRECTORY: direct/src/plugin/
-@@ -5965,7 +6067,6 @@
+@@ -5965,7 +6052,6 @@
    TargetAdd('panda3d.exe', input='libpandaexpress.dll')
    TargetAdd('panda3d.exe', input='libp3dtoolconfig.dll')
    TargetAdd('panda3d.exe', input='libp3dtool.dll')
@@ -758,7 +736,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('panda3d.exe', input='libp3tinyxml.ilb')
    TargetAdd('panda3d.exe', opts=['NOICON', 'OPENSSL', 'ZLIB', 'WINGDI', 'WINUSER', 'WINSHELL', 'ADVAPI', 'WINSOCK2', 'WINOLE', 'CARBON'])
  
-@@ -5979,7 +6080,6 @@
+@@ -5979,7 +6065,6 @@
      TargetAdd('Panda3D.app', input='libpandaexpress.dll')
      TargetAdd('Panda3D.app', input='libp3dtoolconfig.dll')
      TargetAdd('Panda3D.app', input='libp3dtool.dll')
@@ -766,7 +744,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
      TargetAdd('Panda3D.app', input='libp3tinyxml.ilb')
      TargetAdd('Panda3D.app', input='panda3d_mac.plist', ipath=OPTS)
      TargetAdd('Panda3D.app', input='models/plugin_images/panda3d.icns')
-@@ -5994,18 +6094,16 @@
+@@ -5994,18 +6079,16 @@
      TargetAdd('panda3dw.exe', input='libpandaexpress.dll')
      TargetAdd('panda3dw.exe', input='libp3dtoolconfig.dll')
      TargetAdd('panda3dw.exe', input='libp3dtool.dll')
@@ -786,7 +764,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('plugin_standalone_dtoolbase_composite1.obj', opts=OPTS, input='p3dtoolbase_composite1.cxx')
    TargetAdd('plugin_standalone_dtoolbase_composite2.obj', opts=OPTS, input='p3dtoolbase_composite2.cxx')
    TargetAdd('plugin_standalone_lookup3.obj', opts=OPTS, input='lookup3.c')
-@@ -6023,7 +6121,6 @@
+@@ -6023,7 +6106,6 @@
    TargetAdd('p3dembed.exe', input='plugin_standalone_panda3dBase.obj')
    TargetAdd('p3dembed.exe', input='plugin_standalone_p3dEmbedMain.obj')
    TargetAdd('p3dembed.exe', input='plugin_standalone_p3dEmbed.obj')
@@ -794,7 +772,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('p3dembed.exe', input='plugin_standalone_dtoolbase_composite1.obj')
    TargetAdd('p3dembed.exe', input='plugin_standalone_dtoolbase_composite2.obj')
    TargetAdd('p3dembed.exe', input='plugin_standalone_lookup3.obj')
-@@ -6053,7 +6150,6 @@
+@@ -6053,7 +6135,6 @@
      TargetAdd('p3dembedw.exe', input='plugin_standalone_panda3dBase.obj')
      TargetAdd('p3dembedw.exe', input='plugin_standalone_p3dEmbedWinMain.obj')
      TargetAdd('p3dembedw.exe', input='plugin_standalone_p3dEmbed.obj')
@@ -802,7 +780,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
      TargetAdd('p3dembedw.exe', input='plugin_standalone_dtoolbase_composite1.obj')
      TargetAdd('p3dembedw.exe', input='plugin_standalone_dtoolbase_composite2.obj')
      TargetAdd('p3dembedw.exe', input='plugin_standalone_lookup3.obj')
-@@ -6495,7 +6591,19 @@
+@@ -6495,7 +6576,19 @@
    TargetAdd('pfm-trans.exe', input='pfm-trans_pfmTrans.obj')
    TargetAdd('pfm-trans.exe', input='libp3progbase.lib')
    TargetAdd('pfm-trans.exe', input='libp3pandatoolbase.lib')
@@ -822,7 +800,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
    TargetAdd('pfm-trans.exe', opts=['ADVAPI'])
  
    TargetAdd('pfm-bba_pfmBba.obj', opts=OPTS, input='pfmBba.cxx')
-@@ -6833,8 +6941,6 @@
+@@ -6833,8 +6926,6 @@
      TargetAdd('mayaeggimport'+VNUM+'.mll', input='mayaeggimport'+VNUM+'_mayaeggimport.obj')
      TargetAdd('mayaeggimport'+VNUM+'.mll', input='libpandaegg.dll')
      TargetAdd('mayaeggimport'+VNUM+'.mll', input=COMMON_PANDA_LIBS)
@@ -831,7 +809,7 @@ diff --git a/makepanda/makepanda.py b/makepanda/makepanda.py
      TargetAdd('mayaeggimport'+VNUM+'.mll', opts=['ADVAPI', VER]+ARCH_OPTS)
  
      TargetAdd('mayaloader'+VNUM+'_config_mayaloader.obj', opts=OPTS, input='config_mayaloader.cxx')
-@@ -6971,7 +7077,7 @@
+@@ -6971,7 +7062,7 @@
  #
  # DIRECTORY: pandatool/src/deploy-stub
  #

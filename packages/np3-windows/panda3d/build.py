@@ -35,6 +35,7 @@ def run(req: InstallRequirement,
     shutil.copytree(__np__.find_dep_include("freetype"), os.path.join("thirdparty", "win-libs-vc14-x64", "freetype", "include", "freetype2"))
     shutil.copytree(__np__.find_dep_root("harfbuzz"), os.path.join("thirdparty", "win-libs-vc14-x64", "harfbuzz"))
     shutil.copytree(__np__.find_dep_root("jpeg"), os.path.join("thirdparty", "win-libs-vc14-x64", "jpeg"))
+    shutil.copytree(__np__.find_dep_root("mimalloc"), os.path.join("thirdparty", "win-libs-vc14-x64", "mimalloc"))
     shutil.copytree(__np__.find_dep_root("nvidiacg"), os.path.join("thirdparty", "win-libs-vc14-x64", "nvidiacg"))
     shutil.copytree(__np__.find_dep_root("ode"), os.path.join("thirdparty", "win-libs-vc14-x64", "ode"))
     shutil.copytree(__np__.find_dep_root("ogg"), os.path.join("thirdparty", "win-libs-vc14-x64", "ogg"))
