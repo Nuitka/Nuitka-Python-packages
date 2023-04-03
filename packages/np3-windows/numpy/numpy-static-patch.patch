@@ -1,0 +1,102 @@
+From 278f85ee9a8e98f90bcf2a47706e9a746e38a254 Mon Sep 17 00:00:00 2001
+From: jshenguru <john.q.shen@gmail.com>
+Date: Mon, 3 Apr 2023 08:51:29 -0400
+Subject: [PATCH] changes for Nuitka-Python
+
+---
+ numpy/distutils/command/build_ext.py | 42 ++++++++++++++++++++++------
+ numpy/distutils/misc_util.py         |  6 ++--
+ 2 files changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/numpy/distutils/command/build_ext.py b/numpy/distutils/command/build_ext.py
+index 6dc6b4265..b4a7dbf97 100644
+--- a/numpy/distutils/command/build_ext.py
++++ b/numpy/distutils/command/build_ext.py
+@@ -4,6 +4,8 @@
+ import os
+ import subprocess
+ from glob import glob
++import json
++import shutil
+ 
+ from distutils.dep_util import newer_group
+ from distutils.command.build_ext import build_ext as old_build_ext
+@@ -21,6 +23,8 @@
+ from numpy.distutils.command.config_compiler import show_fortran_compilers
+ from numpy.distutils.ccompiler_opt import new_ccompiler_opt, CCompilerOpt
+ 
++from __np__ import write_linker_json
++
+ class build_ext (old_build_ext):
+ 
+     description = "build C/C++/F extensions (compile/link to build directory)"
+@@ -605,15 +609,35 @@ def build_extension(self, ext):
+                     fcompiler, library_dirs,
+                     unlinkable_fobjects)
+ 
+-        linker(objects, ext_filename,
+-               libraries=libraries,
+-               library_dirs=library_dirs,
+-               runtime_library_dirs=ext.runtime_library_dirs,
+-               extra_postargs=extra_args,
+-               export_symbols=self.get_export_symbols(ext),
+-               debug=self.debug,
+-               build_temp=self.build_temp,
+-               target_lang=ext.language)
++        ext_filename = ext_filename.replace(".so", "")
++
++        self.compiler.create_static_lib(
++            objects, ext_filename, 
++            output_dir=os.path.abspath("."), 
++            debug=self.debug,
++            target_lang=ext.language)
++
++        result_path = \
++            self.compiler.library_filename(ext_filename, output_dir=os.path.abspath("."))
++        
++        with open(result_path + '.link.json', 'w') as f:
++            json.dump({
++                'libraries': self.get_libraries(ext),
++                'library_dirs': ext.library_dirs + ['lib'],
++                'runtime_library_dirs': ext.runtime_library_dirs,
++                'extra_postargs': extra_args}, f)
++                
++        for lib in self.get_libraries(ext):
++            for dir in ext.library_dirs:
++                lib_install_dir = os.path.join(os.path.dirname(ext_path), dir)
++                print(os.path.join(ext_path, dir, lib + '.lib'))
++                if os.path.isfile(os.path.join(dir, lib + '.lib')):
++                    if not os.path.isabs(dir):
++                        if not os.path.exists(lib_install_dir):
++                            os.makedirs(lib_install_dir)
++                        shutil.copyfile(os.path.join(dir, lib + '.lib'), os.path.join(lib_install_dir, lib + '.lib'))
++                    break
++                    
+ 
+     def _add_dummy_mingwex_sym(self, c_sources):
+         build_src = self.get_finalized_command("build_src").build_src
+diff --git a/numpy/distutils/misc_util.py b/numpy/distutils/misc_util.py
+index 79ba08515..623f77dc3 100644
+--- a/numpy/distutils/misc_util.py
++++ b/numpy/distutils/misc_util.py
+@@ -31,6 +31,8 @@ def clean_up_temporary_directory():
+ 
+ atexit.register(clean_up_temporary_directory)
+ 
++from numpy.compat import npy_load_module
++
+ __all__ = ['Configuration', 'get_numpy_include_dirs', 'default_config_dict',
+            'dict_append', 'appendpath', 'generate_config_py',
+            'get_cmd', 'allpath', 'get_mathlibs',
+@@ -2487,7 +2489,5 @@ def exec_mod_from_location(modname, modfile):
+     `modfile`. Depending on the `spec.loader`, the module may not be
+     registered in sys.modules.
+     '''
+-    spec = importlib.util.spec_from_file_location(modname, modfile)
+-    foo = importlib.util.module_from_spec(spec)
+-    spec.loader.exec_module(foo)
++    foo = npy_load_module(modname, modfile, ('.py', 'U', 1))
+     return foo
+-- 
+2.39.1.windows.1
+
