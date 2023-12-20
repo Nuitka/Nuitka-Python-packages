@@ -19,7 +19,13 @@ def run(temp_dir: str):
     os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
     os.environ["CFLAGS"] = sysconfig.get_config_var("CFLAGS")
     print("bash", os.path.join(src_dir, "configure"), "--disable-shared", "--with-zlib-prefix=" + __np__.find_dep_root("zlib"))
-    __np__.run_with_output("bash", os.path.join(src_dir, "configure"), "--disable-shared", "--with-zlib-prefix=" + __np__.find_dep_root("zlib"), "--prefix=" + prefix_dir)
+    __np__.run_with_output(
+        "bash",
+        os.path.join(src_dir, "configure"),
+        "--disable-shared",
+        "--with-zlib-prefix=" + __np__.find_dep_root("zlib"),
+        f"--prefix={prefix_dir}",
+    )
     __np__.run_with_output("sed", "-i", '', 's/#if PNG_ZLIB_VERNUM != 0 && PNG_ZLIB_VERNUM != ZLIB_VERNUM/#if 0/g', os.path.join(src_dir, "pngpriv.h"))
     __np__.run_with_output("make")
     __np__.run_with_output("make", "install")
