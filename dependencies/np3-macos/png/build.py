@@ -25,4 +25,4 @@ def run(temp_dir: str):
     __np__.run_with_output("make", "install")
 
     __np__.install_dep_libs("png", os.path.join(prefix_dir, "lib", "*"))
-    __np__.install_dep_include("png", os.path.join(prefix_dir, "include", "**", "*.h"), base_dir=os.path.join(prefix_dir, "include"))
+    __np__.install_dep_include("png", os.path.join(prefix_dir, "include", "*.h"), base_dir=os.path.join(prefix_dir, "include"))
