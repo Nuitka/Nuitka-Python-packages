@@ -7,7 +7,7 @@ import glob
 
 
 def run(temp_dir: str):
-    __np__.download_extract("https://www.openal-soft.org/openal-releases/openal-soft-1.21.1.tar.bz2", temp_dir)
+    __np__.download_extract("https://github.com/kcat/openal-soft/archive/refs/tags/1.21.1.tar.gz", temp_dir)
 
     __np__.setup_compiler_env()
 
