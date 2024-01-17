@@ -2,7 +2,7 @@
   "scripts": [
     {
       "metadata": {
-        "Version": "4.[6-9].[0-3]"
+        "Version": "4.6.[0-3]"
       },
       "build_tools": [
         "patch"
