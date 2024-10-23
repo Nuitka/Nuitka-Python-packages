@@ -1,0 +1,63 @@
+# HG changeset patch
+# User jshenguru <john.q.shen@gmail.com>
+# Date 1680545264 14400
+#      Mon Apr 03 14:07:44 2023 -0400
+# Branch release-1.15
+# Node ID dac2f1f7a3131c8b01d5cc47fc46ed89260aaa56
+# Parent  c649a735cf829040d859c3c2ca52d7f5afb5a139
+changes for Nuitka-Python
+
+diff -r c649a735cf82 -r dac2f1f7a313 c/misc_win32.h
+--- a/c/misc_win32.h	Thu Jun 30 11:00:59 2022 -0700
++++ b/c/misc_win32.h	Mon Apr 03 14:07:44 2023 -0400
+@@ -8,30 +8,6 @@
+ 
+ static DWORD cffi_tls_index = TLS_OUT_OF_INDEXES;
+ 
+-BOOL WINAPI DllMain(HINSTANCE hinstDLL,
+-                    DWORD     reason_for_call,
+-                    LPVOID    reserved)
+-{
+-    LPVOID p;
+-
+-    switch (reason_for_call) {
+-
+-    case DLL_THREAD_DETACH:
+-        if (cffi_tls_index != TLS_OUT_OF_INDEXES) {
+-            p = TlsGetValue(cffi_tls_index);
+-            if (p != NULL) {
+-                TlsSetValue(cffi_tls_index, NULL);
+-                cffi_thread_shutdown(p);
+-            }
+-        }
+-        break;
+-
+-    default:
+-        break;
+-    }
+-    return TRUE;
+-}
+-
+ static void init_cffi_tls(void)
+ {
+     if (cffi_tls_index == TLS_OUT_OF_INDEXES) {
+diff -r c649a735cf82 -r dac2f1f7a313 setup.py
+--- a/setup.py	Thu Jun 30 11:00:59 2022 -0700
++++ b/setup.py	Mon Apr 03 14:07:44 2023 -0400
+@@ -132,14 +132,12 @@
+         assert os.path.isdir(COMPILE_LIBFFI), "directory not found!"
+         include_dirs[:] = [COMPILE_LIBFFI]
+         libraries[:] = []
+-        _filenames = [filename.lower() for filename in os.listdir(COMPILE_LIBFFI)]
+-        _filenames = [filename for filename in _filenames
+-                            if filename.endswith('.c')]
++        _filenames = []
++
+         if sys.maxsize > 2**32:
+             # 64-bit: unlist win32.c, and add instead win64.obj.  If the obj
+             # happens to get outdated at some point in the future, you need to
+             # rebuild it manually from win64.asm.
+-            _filenames.remove('win32.c')
+             extra_link_args.append(os.path.join(COMPILE_LIBFFI, 'win64.obj'))
+         sources.extend(os.path.join(COMPILE_LIBFFI, filename)
+                     for filename in _filenames)
