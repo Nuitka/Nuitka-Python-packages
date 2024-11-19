@@ -1,0 +1,17 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "1.15.*"
+      },
+      "build_tools": [
+        "patch"
+      ],
+      "files": [
+        "build.py",
+        "cffi-static-patch.patch"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}
