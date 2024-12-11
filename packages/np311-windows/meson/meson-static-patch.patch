@@ -1,0 +1,57 @@
+diff --git a/mesonbuild/dependencies/python.py b/mesonbuild/dependencies/python.py
+index 326e605d8..aa19f837b 100644
+--- a/mesonbuild/dependencies/python.py
++++ b/mesonbuild/dependencies/python.py
+@@ -217,7 +217,7 @@ class _PythonDependencyBase(_Base):
+             verdot = self.variables.get('py_version_short')
+             imp_lower = self.variables.get('implementation_lower', 'python')
+             if self.static:
+-                libpath = Path('libs') / f'libpython{vernum}.a'
++                libpath = Path('libs') / f'python{vernum}.lib'
+             else:
+                 if limited_api:
+                     vernum = vernum[0]
+diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
+index 1b7a05640..198aa30a3 100644
+--- a/mesonbuild/modules/python.py
++++ b/mesonbuild/modules/python.py
+@@ -10,7 +10,7 @@ from . import ExtensionModule, ModuleInfo
+ from .. import mesonlib
+ from .. import mlog
+ from ..options import UserFeatureOption
+-from ..build import known_shmod_kwargs, CustomTarget, CustomTargetIndex, BuildTarget, GeneratedList, StructuredSources, ExtractedObjects, SharedModule
++from ..build import known_shmod_kwargs, CustomTarget, CustomTargetIndex, BuildTarget, GeneratedList, StructuredSources, ExtractedObjects, SharedModule, StaticLibrary
+ from ..dependencies import NotFoundDependency
+ from ..dependencies.detect import get_dep_identifier, find_external_dependency
+ from ..dependencies.python import BasicPythonExternalProgram, python_factory, _PythonDependencyBase
+@@ -230,7 +230,7 @@ class PythonInstallation(_ExternalProgramHolder['PythonExternalProgram']):
+                 (self.is_pypy or mesonlib.version_compare(self.version, '>=3.9')):
+             kwargs['gnu_symbol_visibility'] = 'inlineshidden'
+
+-        return self.interpreter.build_target(self.current_node, args, kwargs, SharedModule)
++        return self.interpreter.build_target(self.current_node, args, kwargs, StaticLibrary)
+
+     def _convert_api_version_to_py_version_hex(self, api_version: str, detected_version: str) -> str:
+         python_api_version_format = re.compile(r'[0-9]\.[0-9]{1,2}')
+diff --git a/mesonbuild/modules/python3.py b/mesonbuild/modules/python3.py
+index 2e6779ab2..20068d6b0 100644
+--- a/mesonbuild/modules/python3.py
++++ b/mesonbuild/modules/python3.py
+@@ -10,7 +10,7 @@ from .. import mesonlib
+ from . import ExtensionModule, ModuleInfo
+ from ..build import (
+     BuildTarget, CustomTarget, CustomTargetIndex, ExtractedObjects,
+-    GeneratedList, SharedModule, StructuredSources, known_shmod_kwargs
++    GeneratedList, SharedModule, StaticLibrary, StructuredSources, known_shmod_kwargs
+ )
+ from ..interpreter.type_checking import SHARED_MOD_KWS
+ from ..interpreterbase import typed_kwargs, typed_pos_args, noPosargs, noKwargs, permittedKwargs
+@@ -53,7 +53,7 @@ class Python3Module(ExtensionModule):
+             suffix = []
+         kwargs['name_prefix'] = ''
+         kwargs['name_suffix'] = suffix
+-        return self.interpreter.build_target(state.current_node, args, kwargs, SharedModule)
++        return self.interpreter.build_target(state.current_node, args, kwargs, StaticLibrary)
+
+     @noPosargs
+     @noKwargs
