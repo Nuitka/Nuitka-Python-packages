@@ -4,18 +4,21 @@
       "metadata": {
         "Version": "*"
       },
-      "build_tools": ["ninja"],
+      "build_tools": ["cmake", "ninja", "flang", "clang", "mingw", "git"],
       "dependencies": ["openblas"],
       "files": [
         "build.py",
-        "numpy-static-patch.patch"
+        "scipy-static-patch.patch"
       ],
       "requires": [
         "setuptools",
-        "packaging",
+        "meson-python",
+        "meson",
         "pyproject-metadata",
-        "meson-python>=0.15.0",
-        "Cython>=3.0.6"
+        "Cython>=3.0.8",
+        "pybind11>=2.13.2",
+        "pythran>=0.14.0",
+        "numpy>=1.23.5"
       ],
       "build_script": "build.py"
     }

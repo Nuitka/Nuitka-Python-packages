@@ -1,8 +1,6 @@
 {
-  "version": "1.5.1",
-  "build_tools": [
-    "lessmsi"
-  ],
+  "version": "14.2.0",
+  "build_tools": [ "7zip" ],
   "files": [
     "build.py"
   ],

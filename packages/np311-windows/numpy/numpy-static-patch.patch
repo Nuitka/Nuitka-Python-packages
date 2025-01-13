@@ -191,3 +191,41 @@ index 45ad850..11ebcf0 100644
 
      @noPosargs
      @noKwargs
+diff --git a/numpy/linalg/meson.build b/numpy/linalg/meson.build
+index 740c9f5..6341fdb 100644
+--- a/numpy/linalg/meson.build
++++ b/numpy/linalg/meson.build
+@@ -3,18 +3,7 @@
+ python_xerbla_sources = ['lapack_lite/python_xerbla.c']
+
+ lapack_lite_sources = []
+-if not have_lapack
+-  lapack_lite_sources = [
+-    'lapack_lite/f2c.c',
+-    'lapack_lite/f2c_c_lapack.c',
+-    'lapack_lite/f2c_d_lapack.c',
+-    'lapack_lite/f2c_s_lapack.c',
+-    'lapack_lite/f2c_z_lapack.c',
+-    'lapack_lite/f2c_blas.c',
+-    'lapack_lite/f2c_config.c',
+-    'lapack_lite/f2c_lapack.c',
+-  ]
+-endif
++
+
+ py.extension_module('lapack_lite',
+   [
+diff --git a/numpy/f2py/src/fortranobject.h b/numpy/f2py/src/fortranobject.h
+index 4aed2f6..53d4012 100644
+--- a/numpy/f2py/src/fortranobject.h
++++ b/numpy/f2py/src/fortranobject.h
+@@ -12,7 +12,9 @@ extern "C" {
+ #ifdef FORTRANOBJECT_C
+ #define NO_IMPORT_ARRAY
+ #endif
++#ifndef PY_ARRAY_UNIQUE_SYMBOL
+ #define PY_ARRAY_UNIQUE_SYMBOL _npy_f2py_ARRAY_API
++#endif
+ #include "numpy/arrayobject.h"
+ #include "numpy/npy_3kcompat.h"
+

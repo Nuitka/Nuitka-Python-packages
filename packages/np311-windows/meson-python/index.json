@@ -13,7 +13,8 @@
         "meson_python-static-patch.patch"
       ],
       "requires": [
-        "setuptools"
+        "setuptools",
+        "meson"
       ],
       "build_script": "build.py"
     }
