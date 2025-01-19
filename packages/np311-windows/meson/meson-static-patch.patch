@@ -1,5 +1,52 @@
+diff --git a/mesonbuild/build.py b/mesonbuild/build.py
+index cf71dc2..423b008 100644
+--- a/mesonbuild/build.py
++++ b/mesonbuild/build.py
+@@ -2169,7 +2169,10 @@ class StaticLibrary(BuildTarget):
+                 elif self.rust_crate_type == 'staticlib':
+                     self.suffix = 'a'
+             else:
+-                self.suffix = 'a'
++                if self.environment.machines[self.for_machine].is_windows():
++                    self.suffix = 'lib'
++                else:
++                    self.suffix = 'a'
+         self.filename = self.prefix + self.name + '.' + self.suffix
+         self.outputs[0] = self.filename
+ 
+@@ -2233,6 +2236,8 @@ class SharedLibrary(BuildTarget):
+             environment: environment.Environment,
+             compilers: T.Dict[str, 'Compiler'],
+             kwargs):
++        raise NotImplementedError("SharedLibrary builds not allowed on Nuitka-Python!")
++
+         self.soversion: T.Optional[str] = None
+         self.ltversion: T.Optional[str] = None
+         # Max length 2, first element is compatibility_version, second is current_version
+diff --git a/mesonbuild/cmake/toolchain.py b/mesonbuild/cmake/toolchain.py
+index 9eb961c..ffa9f89 100644
+--- a/mesonbuild/cmake/toolchain.py
++++ b/mesonbuild/cmake/toolchain.py
+@@ -174,6 +174,8 @@ class CMakeToolchain:
+ 
+         # Set the compiler variables
+         for lang, comp_obj in self.compilers.items():
++            if lang == 'cython':
++                continue
+             prefix = 'CMAKE_{}_'.format(language_map.get(lang, lang.upper()))
+ 
+             exe_list = comp_obj.get_exelist()
+@@ -210,7 +212,7 @@ class CMakeToolchain:
+         # Generate the CMakeLists.txt
+         mlog.debug('CMake Toolchain: Calling CMake once to generate the compiler state')
+         languages = list(self.compilers.keys())
+-        lang_ids = [language_map.get(x, x.upper()) for x in languages]
++        lang_ids = [language_map.get(x, x.upper()) for x in languages if x != 'cython']
+         cmake_content = dedent(f'''
+             cmake_minimum_required(VERSION 3.10)
+             project(CompInfo {' '.join(lang_ids)})
 diff --git a/mesonbuild/dependencies/python.py b/mesonbuild/dependencies/python.py
-index 326e605d8..aa19f837b 100644
+index 326e605..aa19f83 100644
 --- a/mesonbuild/dependencies/python.py
 +++ b/mesonbuild/dependencies/python.py
 @@ -217,7 +217,7 @@ class _PythonDependencyBase(_Base):
@@ -12,7 +59,7 @@ index 326e605d8..aa19f837b 100644
                  if limited_api:
                      vernum = vernum[0]
 diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
-index 1b7a05640..198aa30a3 100644
+index 1b7a056..198aa30 100644
 --- a/mesonbuild/modules/python.py
 +++ b/mesonbuild/modules/python.py
 @@ -10,7 +10,7 @@ from . import ExtensionModule, ModuleInfo
@@ -27,14 +74,14 @@ index 1b7a05640..198aa30a3 100644
 @@ -230,7 +230,7 @@ class PythonInstallation(_ExternalProgramHolder['PythonExternalProgram']):
                  (self.is_pypy or mesonlib.version_compare(self.version, '>=3.9')):
              kwargs['gnu_symbol_visibility'] = 'inlineshidden'
-
+ 
 -        return self.interpreter.build_target(self.current_node, args, kwargs, SharedModule)
 +        return self.interpreter.build_target(self.current_node, args, kwargs, StaticLibrary)
-
+ 
      def _convert_api_version_to_py_version_hex(self, api_version: str, detected_version: str) -> str:
          python_api_version_format = re.compile(r'[0-9]\.[0-9]{1,2}')
 diff --git a/mesonbuild/modules/python3.py b/mesonbuild/modules/python3.py
-index 2e6779ab2..20068d6b0 100644
+index 2e6779a..20068d6 100644
 --- a/mesonbuild/modules/python3.py
 +++ b/mesonbuild/modules/python3.py
 @@ -10,7 +10,7 @@ from .. import mesonlib
@@ -52,53 +99,6 @@ index 2e6779ab2..20068d6b0 100644
          kwargs['name_suffix'] = suffix
 -        return self.interpreter.build_target(state.current_node, args, kwargs, SharedModule)
 +        return self.interpreter.build_target(state.current_node, args, kwargs, StaticLibrary)
-
+ 
      @noPosargs
      @noKwargs
-diff --git a/mesonbuild/cmake/toolchain.py b/mesonbuild/cmake/toolchain.py
-index 43f2626..6966174 100644
---- a/mesonbuild/cmake/toolchain.py
-+++ b/mesonbuild/cmake/toolchain.py
-@@ -174,6 +174,8 @@ class CMakeToolchain:
-
-         # Set the compiler variables
-         for lang, comp_obj in self.compilers.items():
-+            if lang == 'cython':
-+                continue
-             prefix = 'CMAKE_{}_'.format(language_map.get(lang, lang.upper()))
-
-             exe_list = comp_obj.get_exelist()
-@@ -210,7 +212,7 @@ class CMakeToolchain:
-         # Generate the CMakeLists.txt
-         mlog.debug('CMake Toolchain: Calling CMake once to generate the compiler state')
-         languages = list(self.compilers.keys())
--        lang_ids = [language_map.get(x, x.upper()) for x in languages]
-+        lang_ids = [language_map.get(x, x.upper()) for x in languages if x != 'cython']
-         cmake_content = dedent(f'''
-             cmake_minimum_required(VERSION 3.10)
-             project(CompInfo {' '.join(lang_ids)})
-diff --git a/mesonbuild/build.py b/mesonbuild/build.py
-index 460ed54..a0c76ad 100644
---- a/mesonbuild/build.py
-+++ b/mesonbuild/build.py
-@@ -2163,7 +2163,10 @@ class StaticLibrary(BuildTarget):
-                 elif self.rust_crate_type == 'staticlib':
-                     self.suffix = 'a'
-             else:
--                self.suffix = 'a'
-+                if self.environment.machines[self.for_machine].is_windows():
-+                    self.suffix = 'lib'
-+                else:
-+                    self.suffix = 'a'
-         self.filename = self.prefix + self.name + '.' + self.suffix
-         self.outputs[0] = self.filename
-
-@@ -2219,6 +2222,8 @@ class SharedLibrary(BuildTarget):
-             environment: environment.Environment,
-             compilers: T.Dict[str, 'Compiler'],
-             kwargs):
-+        raise NotImplementedError("SharedLibrary builds not allowed on Nuitka-Python!")
-+
-         self.soversion: T.Optional[str] = None
-         self.ltversion: T.Optional[str] = None
-         # Max length 2, first element is compatibility_version, second is current_version
