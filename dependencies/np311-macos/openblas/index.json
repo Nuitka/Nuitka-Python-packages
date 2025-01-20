@@ -1,0 +1,11 @@
+{
+  "version": "0.3.28",
+  "build_tools": [
+    "cmake"
+  ],
+  "dependencies": [ ],
+  "files": [
+    "build.py"
+  ],
+  "build_script": "build.py"
+}

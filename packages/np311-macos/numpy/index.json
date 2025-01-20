@@ -1,0 +1,23 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "*"
+      },
+      "build_tools": ["ninja"],
+      "dependencies": ["openblas"],
+      "files": [
+        "build.py",
+        "numpy-static-patch.patch"
+      ],
+      "requires": [
+        "setuptools",
+        "packaging",
+        "pyproject-metadata",
+        "meson-python>=0.15.0",
+        "Cython>=3.0.6"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}

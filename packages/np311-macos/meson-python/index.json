@@ -1,0 +1,20 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "*"
+      },
+      "build_tools": [],
+      "dependencies": [],
+      "files": [
+        "build.py",
+        "meson_python-static-patch.patch"
+      ],
+      "requires": [
+        "setuptools",
+        "meson"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}
