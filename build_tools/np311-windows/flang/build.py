@@ -14,3 +14,6 @@ def run(temp_dir: str):
                               "flang", "perl", "libflang")
 
     __np__.install_build_tool("flang", os.path.join(temp_dir, "Library", "*"))
+
+    with open(os.path.join(__np__.getToolsInstallDir(), "flang", "link.json"), 'w') as f:
+        f.write('{"library_dirs":["lib"]}')
