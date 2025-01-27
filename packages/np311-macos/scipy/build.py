@@ -22,7 +22,7 @@ def run(wheel_directory):
                    os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"])
     env["FC"] = __np__.find_build_tool_exe("clang", "flang-new")
     env["FC_LD"] = __np__.find_build_tool_exe("clang", "ld64.lld")
-    env["LDFLAGS"] = "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -fuse-ld=/Users/m1/Library/Nuitka-Python311/build_tools/clang/bin/ld64.lld"
+    env["LDFLAGS"] = "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -fuse-ld=" + __np__.find_build_tool_exe("clang", "ld64.lld")
     env["LIB"] = os.pathsep + __np__.find_dep_libs("openblas")
     env["INCLUDE"] = os.pathsep + __np__.find_dep_include("openblas")
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
