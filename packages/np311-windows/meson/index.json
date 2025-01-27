@@ -2,20 +2,37 @@
   "scripts": [
     {
       "metadata": {
-        "Version": "*"
+        "Version": "1.6.*"
       },
       "build_tools": [
         "patch"
       ],
       "dependencies": [],
       "files": [
-        "build.py",
-        "meson-static-patch.patch"
+        "1.6.0/build.py",
+        "1.6.0/meson-static-patch.patch"
       ],
       "requires": [
         "setuptools"
       ],
-      "build_script": "build.py"
+      "build_script": "1.6.0/build.py"
+    },
+    {
+      "metadata": {
+        "Version": "1.7.*"
+      },
+      "build_tools": [
+        "patch"
+      ],
+      "dependencies": [],
+      "files": [
+        "1.7.0/build.py",
+        "1.7.0/meson-static-patch.patch"
+      ],
+      "requires": [
+        "setuptools"
+      ],
+      "build_script": "1.7.0/build.py"
     }
   ]
 }
