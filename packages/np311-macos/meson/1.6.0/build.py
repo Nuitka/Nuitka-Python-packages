@@ -7,7 +7,7 @@ import setuptools.build_meta
 
 
 def run(wheel_directory):
-    __np__.run_with_output("patch", "-t", "-p1", "-i",
+    __np__.run("patch", "-t", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "meson-static-patch.patch"))
 
     os.environ["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])

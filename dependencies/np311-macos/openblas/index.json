@@ -1,7 +1,8 @@
 {
   "version": "0.3.28",
   "build_tools": [
-    "cmake"
+    "cmake",
+    "clang"
   ],
   "dependencies": [ ],
   "files": [
