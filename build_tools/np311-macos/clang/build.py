@@ -18,5 +18,5 @@ def run(temp_dir: str):
         __np__.install_build_tool("clang", os.path.join(extract_dir, "*"))
 
     with open(os.path.join(__np__.getToolsInstallDir(), "clang", "link.json"), 'w') as f:
-        f.write('{"libraries": ["lib/libFortranEvaluate.a", "lib/libFortranRuntime.a"]}')
+        f.write('{"libraries": ["lib/libFortranEvaluate.a", "lib/libFortranRuntime.a", "lib/libFortranDecimal.a"]}')
     
