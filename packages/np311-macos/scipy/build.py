@@ -20,15 +20,15 @@ def run(wheel_directory):
     env["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])
     env["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("cmake", "cmake")) + os.pathsep + 
                    os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"])
-    env["FC"] = __np__.find_build_tool_exe("clang", "flang-new")
-    env["FC_LD"] = __np__.find_build_tool_exe("clang", "ld64.lld")
-    env["LDFLAGS"] = "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -fuse-ld=" + __np__.find_build_tool_exe("clang", "ld64.lld")
-    env["LIB"] = os.pathsep + __np__.find_dep_libs("openblas")
-    env["INCLUDE"] = os.pathsep + __np__.find_dep_include("openblas")
+    env["FC"] = __np__.find_build_tool_exe("gcc", "gfortran-nuitka")
+    env["LIB"] = __np__.find_dep_libs("openblas")
+    env["INCLUDE"] = __np__.find_dep_include("openblas")
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
+    env["FFLAGS"] = "-static-libgcc"
     __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation",
-                           "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Dblas=openblas", 
-                           "-Csetup-args=-Dlapack=openblas", env=env)
+                            "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Dblas=openblas", 
+                            "-Csetup-args=-Dlapack=openblas",
+                            "-Csetup-args=-Dfortran_link_args=-static-libgcc", env=env)
 
     wheel_location = glob.glob("scipy-*.whl")[0]
 

@@ -4,7 +4,7 @@
       "metadata": {
         "Version": "*"
       },
-      "build_tools": ["ninja", "clang"],
+      "build_tools": ["ninja", "gcc", "clang"],
       "dependencies": ["openblas"],
       "files": [
         "build.py",
