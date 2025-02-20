@@ -1,0 +1,24 @@
+{
+  "scripts": [
+    {
+      "metadata": {
+        "Version": "*"
+      },
+      "build_tools": [],
+      "dependencies": [
+        "jpeg",
+        "tiff",
+        "freetype",
+        "harfbuzz"
+      ],
+      "files": [
+        "build.py"
+      ],
+      "requires": [
+        "setuptools",
+        "setuptools_scm"
+      ],
+      "build_script": "build.py"
+    }
+  ]
+}
