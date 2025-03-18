@@ -28,7 +28,7 @@ def run(wheel_directory):
     __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation",
                             "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Dblas=openblas", 
                             "-Csetup-args=-Dlapack=openblas",
-                            "-Csetup-args=-Dfortran_link_args=-static-libgcc", env=env)
+                            "-Csetup-args=-Dfortran_link_args=-static-libgcc -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib", env=env)
 
     wheel_location = glob.glob("scipy-*.whl")[0]
 
