@@ -20,6 +20,7 @@ def run(wheel_directory):
     env["INCLUDE"] = os.pathsep + __np__.find_dep_include("openblas")
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
     env["FFLAGS"] = "-static-libgcc"
+    env["PKG_CONFIG"] = "/disabled"
     __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation",
                "-Csetup-args=-Dblas=openblas", "-Csetup-args=-Dlapack=openblas", env=env)
 
