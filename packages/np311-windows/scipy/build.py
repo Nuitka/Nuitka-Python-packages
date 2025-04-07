@@ -32,6 +32,8 @@ def run(wheel_directory):
     env["LIB"] = os.environ["LIB"] + os.pathsep + __np__.find_dep_libs("openblas")
     env["INCLUDE"] = os.environ["INCLUDE"] + os.pathsep + __np__.find_dep_include("openblas")
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
+    env["CFLAGS"] = "/DBYPASS_NP_EMBED"
+    env["CXXFLAGS"] = "/DBYPASS_NP_EMBED"
     __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation",
                            "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", env=env)
 
