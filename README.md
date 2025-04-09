@@ -7,5 +7,5 @@ This repository contains the build scripts for Nuitka-Python packages as well as
 To use the scripts from a local checkout of this repo, set the `NUITKA_PYTHON_PACKAGE_URL` environment variable.
 
 ```
-NUITKA_PYTHON_PACKAGE_URL=file:///C:/src/Nuitka-Python-packages
+NUITKA_PYTHON_PACKAGE_URL=file:///Users/maxwell/nuitka/Nuitka-Python-packages
 ```

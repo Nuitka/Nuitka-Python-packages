@@ -2,6 +2,22 @@
   "scripts": [
     {
       "metadata": {
+        "Version": "0.16.*"
+      },
+      "build_tools": [],
+      "dependencies": [],
+      "files": [
+        "0.16.0/build.py",
+        "0.16.0/meson_python-static-patch.patch"
+      ],
+      "requires": [
+        "setuptools",
+        "meson"
+      ],
+      "build_script": "build.py"
+    },
+    {
+      "metadata": {
         "Version": "*"
       },
       "build_tools": [],
