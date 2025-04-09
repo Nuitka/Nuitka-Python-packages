@@ -10,8 +10,6 @@ def run(temp_dir: str):
                             temp_dir)
 
     os.chdir(temp_dir)
-    env = os.environ.copy()
-    env["PATH"] = os.path.dirname(__np__.find_build_tool_exe("7zip", "7z.exe")) + os.path.pathsep + env["PATH"]
-    __np__.run("7z", "x", result, env=env)
+    __np__.run_build_tool_exe("7zip", "7z.exe", "x", result)
 
     __np__.install_build_tool("mingw", os.path.join(temp_dir, "mingw64", "*"))
