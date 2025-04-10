@@ -18,7 +18,7 @@ def run(wheel_directory):
     env["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])
     env["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("cmake", "cmake")) + os.pathsep +
                    os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"])
-    env["CFLAGS"] = "-I" + sysconfig.get_config_var("INCLUDEPY")
+    env["PKG_CONFIG"] = "/disabled"
     __np__.run_with_output(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation", env=env)
 
     wheel_location = glob.glob("pandas-*.whl")[0]
