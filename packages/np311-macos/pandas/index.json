@@ -4,9 +4,7 @@
       "metadata": {
         "Version": "*"
       },
-      "build_tools": [
-        "patch"
-      ],
+      "build_tools": [],
       "dependencies": [],
       "files": [
         "build.py",
