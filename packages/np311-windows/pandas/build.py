@@ -19,20 +19,24 @@ def run(wheel_directory):
 
     wheel_location = glob.glob("pandas-*.whl")[0]
 
+    env = os.environ.copy()
+    env["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("7zip", "7z.exe")) + os.path.pathsep +
+                   os.path.dirname(__np__.find_build_tool_exe("mingw", "objdump.exe")) + os.path.pathsep + env["PATH"])
+    os.environ.update(env)
     wheel_files = []
     with TemporaryDirectory() as tmpdir:
         with WheelFile(wheel_location) as wf:
             for filename in wf.namelist():
                 wheel_files.append(filename)
                 wf.extract(filename, tmpdir)
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\interval.nuitkapython-311-darwin.a"), "pandas__libs_interval")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\parsers.nuitkapython-311-darwin.a"), "pandas__libs_parsers")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\algos.nuitkapython-311-darwin.a"), "pandas__libs_algos")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\hashtable.nuitkapython-311-darwin.a"), "pandas__libs_hashtable")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\join.nuitkapython-311-darwin.a"), "pandas__libs_join")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\index.nuitkapython-311-darwin.a"), "pandas__libs_index")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\pandas_datetime.nuitkapython-311-darwin.a"), "pandas__libs_pandas_datetime")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\json.nuitkapython-311-darwin.a"), "pandas__libs_json")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\interval.lib"), "pandas__libs_interval")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\parsers.lib"), "pandas__libs_parsers")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\algos.lib"), "pandas__libs_algos")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\hashtable.lib"), "pandas__libs_hashtable")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\join.lib"), "pandas__libs_join")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\index.lib"), "pandas__libs_index")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\pandas_datetime.lib"), "pandas__libs_pandas_datetime")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas\\_libs\\json.lib"), "pandas__libs_json")
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)
