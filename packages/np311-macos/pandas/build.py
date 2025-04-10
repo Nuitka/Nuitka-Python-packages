@@ -27,6 +27,7 @@ def run(wheel_directory):
             for filename in wf.namelist():
                 wheel_files.append(filename)
                 wf.extract(filename, tmpdir)
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas/_libs/lib.nuitkapython-311-darwin.a"), "pandas__libs_lib")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas/_libs/interval.nuitkapython-311-darwin.a"), "pandas__libs_interval")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas/_libs/parsers.nuitkapython-311-darwin.a"), "pandas__libs_parsers")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "pandas/_libs/algos.nuitkapython-311-darwin.a"), "pandas__libs_algos")

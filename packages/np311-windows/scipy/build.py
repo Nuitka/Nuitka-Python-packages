@@ -63,18 +63,6 @@ def run(wheel_directory):
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)
-    # with TemporaryDirectory() as tmpdir:
-    #     extracted_files = []
-    #     with WheelFile(wheel_location) as wf:
-    #         for filename in wf.namelist():
-    #             if not filename.endswith(".lib"):
-    #                 continue
-    #             wf.extract(filename, tmpdir)
-    #             __np__.rename_symbols_in_file(os.path.join(tmpdir, filename), os.path.splitext(filename)[0].replace("\", "_"), ["scipy_sf_error.*"])
-    #             extracted_files.append(filename)
-    #     with WheelFile(wheel_location, 'a') as wf:
-    #         for filename in extracted_files:
-    #             wf.write(os.path.join(tmpdir, filename), filename)
 
     wheel_name = os.path.basename(wheel_location)
     shutil.copy(wheel_location, os.path.join(wheel_directory, wheel_name))
