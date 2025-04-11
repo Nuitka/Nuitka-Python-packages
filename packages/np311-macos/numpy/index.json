@@ -8,7 +8,8 @@
       "dependencies": ["openblas"],
       "files": [
         "build.py",
-        "numpy-static-patch.patch"
+        "numpy-static-patch.patch",
+        "numpy-post.patch"
       ],
       "requires": [
         "setuptools",
