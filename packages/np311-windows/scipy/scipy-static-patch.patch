@@ -1,97 +1,5 @@
-diff --git a/benchmarks/benchmarks/tests/__init__.py b/benchmarks/benchmarks/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/array_api_compat/array_api_compat/dask/__init__.py b/scipy/_lib/array_api_compat/array_api_compat/dask/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/array_api_compat/vendor_test/__init__.py b/scipy/_lib/array_api_compat/vendor_test/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/array_api_compat/vendor_test/vendored/__init__.py b/scipy/_lib/array_api_compat/vendor_test/vendored/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/boost_math/doc/graphs/hypergeometric_1f1/.boost-no-inspect b/scipy/_lib/boost_math/doc/graphs/hypergeometric_1f1/.boost-no-inspect
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/cobyqa/cobyqa/tests/__init__.py b/scipy/_lib/cobyqa/cobyqa/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/cobyqa/cobyqa/utils/tests/__init__.py b/scipy/_lib/cobyqa/cobyqa/utils/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/meson.build b/scipy/_lib/meson.build
-index 8c7f56c..79afd53 100644
---- a/scipy/_lib/meson.build
-+++ b/scipy/_lib/meson.build
-@@ -42,15 +42,6 @@ py3.extension_module('_ccallback_c',
-   subdir: 'scipy/_lib'
- )
- 
--py3.extension_module('_test_ccallback',
--  'src/_test_ccallback.c',
--  dependencies: ccallback_dep,
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/_lib',
--  install_tag: 'tests'
--)
--
- py3.extension_module('_fpumode',
-   '_fpumode.c',
-   include_directories: 'src',
-@@ -59,26 +50,6 @@ py3.extension_module('_fpumode',
-   subdir: 'scipy/_lib'
- )
- 
--py3.extension_module('_test_deprecation_call',
--  cython_gen.process('_test_deprecation_call.pyx'),
--  c_args: cython_c_args,
--  include_directories: 'src',
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/_lib',
--  install_tag: 'tests'
--)
--
--py3.extension_module('_test_deprecation_def',
--  cython_gen.process('_test_deprecation_def.pyx'),
--  c_args: cython_c_args,
--  include_directories: 'src',
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/_lib',
--  install_tag: 'tests'
--)
--
- # May be easier as a compile flag, but use a config header file to stay
- # in sync with what is done in setup.py
- # TODO: the `prefix` here is recommended in
-diff --git a/scipy/_lib/tests/__init__.py b/scipy/_lib/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/cluster/tests/__init__.py b/scipy/cluster/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/constants/tests/__init__.py b/scipy/constants/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/datasets/tests/__init__.py b/scipy/datasets/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/fft/_pocketfft/tests/__init__.py b/scipy/fft/_pocketfft/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/fft/tests/__init__.py b/scipy/fft/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/fftpack/tests/__init__.py b/scipy/fftpack/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/integrate/_ivp/tests/__init__.py b/scipy/integrate/_ivp/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/integrate/meson.build b/scipy/integrate/meson.build
-index 206d504..a5d057a 100644
+index 206d504..59c4d9e 100644
 --- a/scipy/integrate/meson.build
 +++ b/scipy/integrate/meson.build
 @@ -82,7 +82,7 @@ py3.extension_module('_odepack',
@@ -121,36 +29,6 @@ index 206d504..a5d057a 100644
    dependencies: [fortranobject_dep],
    link_args: version_link_args,
    install: true,
-@@ -112,26 +112,6 @@ py3.extension_module('_dop',
-   subdir: 'scipy/integrate'
- )
- 
--py3.extension_module('_test_multivariate',
--  [quadpack_test_src],
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/integrate',
--  install_tag: 'tests'
--)
--
--py3.extension_module('_test_odeint_banded',
--  ['tests/banded5x5.f', f2py_gen.process('tests/test_odeint_banded.pyf')],
--  link_with: [lsoda_lib, mach_lib],
--  fortran_args: _fflag_Wno_unused_dummy_argument,
--  link_args: version_link_args,
--  dependencies: [lapack_dep, fortranobject_dep],
--  install: true,
--  link_language: 'fortran',
--  subdir: 'scipy/integrate',
--  install_tag: 'tests'
--)
--
- subdir('_ivp')
- subdir('_rules')
- subdir('tests')
-diff --git a/scipy/integrate/tests/__init__.py b/scipy/integrate/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/interpolate/meson.build b/scipy/interpolate/meson.build
 index 72e2d20..710eb04 100644
 --- a/scipy/interpolate/meson.build
@@ -164,44 +42,6 @@ index 72e2d20..710eb04 100644
    link_args: version_link_args,
    dependencies: [lapack_dep, fortranobject_dep],
    link_with: [fitpack_lib],
-diff --git a/scipy/interpolate/tests/__init__.py b/scipy/interpolate/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/io/_harwell_boeing/tests/__init__.py b/scipy/io/_harwell_boeing/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/io/arff/tests/__init__.py b/scipy/io/arff/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/io/matlab/tests/__init__.py b/scipy/io/matlab/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/io/meson.build b/scipy/io/meson.build
-index 60f71c6..af04022 100644
---- a/scipy/io/meson.build
-+++ b/scipy/io/meson.build
-@@ -1,18 +1,3 @@
--py3.extension_module('_test_fortran',
--  [
--    f2py_gen.process('test_fortran.pyf'),
--    '_test_fortran.f'
--  ],
--  c_args: [Wno_unused_variable],
--  fortran_args: fortran_ignore_warnings,
--  link_args: version_link_args,
--  dependencies: [lapack_dep, fortranobject_dep],
--  install: true,
--  link_language: 'fortran',
--  subdir: 'scipy/io',
--  install_tag: 'tests'
--)
--
- py3.install_sources([
-     '__init__.py',
-     '_fortran.py',
-diff --git a/scipy/io/tests/__init__.py b/scipy/io/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/linalg/meson.build b/scipy/linalg/meson.build
 index 95925a7..5f7265e 100644
 --- a/scipy/linalg/meson.build
@@ -223,9 +63,6 @@ index 95925a7..5f7265e 100644
    link_args: version_link_args,
    dependencies: [lapack_dep, blas_dep, fortranobject_dep],
    install: true,
-diff --git a/scipy/linalg/tests/__init__.py b/scipy/linalg/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/meson.build b/scipy/meson.build
 index 73168d8..52c193c 100644
 --- a/scipy/meson.build
@@ -244,36 +81,6 @@ index 73168d8..52c193c 100644
    include_directories: [inc_np, inc_f2py],
  )
  
-diff --git a/scipy/ndimage/meson.build b/scipy/ndimage/meson.build
-index 82f64f6..96c76ba 100644
---- a/scipy/ndimage/meson.build
-+++ b/scipy/ndimage/meson.build
-@@ -42,16 +42,6 @@ py3.extension_module('_ctest',
-   install_tag: 'tests'
- )
- 
--py3.extension_module('_cytest',
--  cython_gen.process('src/_cytest.pyx'),
--  c_args: cython_c_args,
--  dependencies: np_dep,
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/ndimage',
--  install_tag: 'tests'
--)
--
- 
- python_sources = [
-   '__init__.py',
-diff --git a/scipy/odr/tests/__init__.py b/scipy/odr/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/optimize/_shgo_lib/__init__.py b/scipy/optimize/_shgo_lib/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/optimize/_trustregion_constr/tests/__init__.py b/scipy/optimize/_trustregion_constr/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/optimize/meson.build b/scipy/optimize/meson.build
 index 519755e..5b31a60 100644
 --- a/scipy/optimize/meson.build
@@ -295,30 +102,6 @@ index 519755e..5b31a60 100644
    install: true,
    link_language: 'fortran',
    subdir: 'scipy/optimize'
-diff --git a/scipy/optimize/tests/__init__.py b/scipy/optimize/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/signal/tests/__init__.py b/scipy/signal/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/csgraph/tests/__init__.py b/scipy/sparse/csgraph/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/linalg/_dsolve/tests/__init__.py b/scipy/sparse/linalg/_dsolve/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/linalg/_eigen/arpack/tests/__init__.py b/scipy/sparse/linalg/_eigen/arpack/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/linalg/_eigen/lobpcg/tests/__init__.py b/scipy/sparse/linalg/_eigen/lobpcg/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/linalg/_eigen/tests/__init__.py b/scipy/sparse/linalg/_eigen/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/linalg/_isolve/tests/__init__.py b/scipy/sparse/linalg/_isolve/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/sparse/linalg/_propack/meson.build b/scipy/sparse/linalg/_propack/meson.build
 index d33cdc0..080cfd8 100644
 --- a/scipy/sparse/linalg/_propack/meson.build
@@ -339,18 +122,6 @@ index d33cdc0..080cfd8 100644
      fortran_args: _fflag_Wno_maybe_uninitialized,
      dependencies: [lapack_dep, blas_dep, fortranobject_dep],
      link_args: version_link_args,
-diff --git a/scipy/sparse/linalg/tests/__init__.py b/scipy/sparse/linalg/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/sparse/tests/__init__.py b/scipy/sparse/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/spatial/tests/__init__.py b/scipy/spatial/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/spatial/transform/tests/__init__.py b/scipy/spatial/transform/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/special/_ellip_harm_2.pyx b/scipy/special/_ellip_harm_2.pyx
 index e9295c2..8196e88 100644
 --- a/scipy/special/_ellip_harm_2.pyx
@@ -369,9 +140,6 @@ index e9295c2..8196e88 100644
 -    """
 -    return PyUFunc_getfperr()
 +
-diff --git a/scipy/special/_precompute/__init__.py b/scipy/special/_precompute/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/special/_ufuncs_extra_code_common.pxi b/scipy/special/_ufuncs_extra_code_common.pxi
 index 8e1ff08..ce867bc 100644
 --- a/scipy/special/_ufuncs_extra_code_common.pxi
@@ -393,7 +161,7 @@ index 8e1ff08..ce867bc 100644
  cimport libc
  
 diff --git a/scipy/special/meson.build b/scipy/special/meson.build
-index 3c42247..a06e33d 100644
+index 3c42247..5d8f44d 100644
 --- a/scipy/special/meson.build
 +++ b/scipy/special/meson.build
 @@ -25,18 +25,12 @@ _ufuncs_pxi_pxd_sources = [
@@ -427,7 +195,7 @@ index 3c42247..a06e33d 100644
    install: true,
    subdir: 'scipy/special',
    install_rpath: '$ORIGIN'
-@@ -234,22 +228,6 @@ py3.extension_module('_comb',
+@@ -234,21 +228,6 @@ py3.extension_module('_comb',
    subdir: 'scipy/special'
  )
  
@@ -446,16 +214,9 @@ index 3c42247..a06e33d 100644
 -  subdir: 'scipy/special',
 -  install_tag: 'tests'
 -)
--
+ 
  # Must use `custom_target`, because `py3.install_sources` does not work with
  # generated sources - see https://github.com/mesonbuild/meson/issues/7372
- npz_files = [
-diff --git a/scipy/special/tests/__init__.py b/scipy/special/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/special/tests/data/__init__.py b/scipy/special/tests/data/__init__.py
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/special/xsf/cephes/chbevl.h b/scipy/special/xsf/cephes/chbevl.h
 index caaa74f..3f13222 100644
 --- a/scipy/special/xsf/cephes/chbevl.h
@@ -837,12 +598,6 @@ index c57472f..3a015cc 100644
    ],
    cython_gen.process('rcont.pyx'),
    include_directories: ['../libnpyrandom'],
-diff --git a/scipy/stats/_unuran/__init__.py b/scipy/stats/_unuran/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/stats/_unuran/config.h b/scipy/stats/_unuran/config.h
-deleted file mode 100644
-index e69de29..0000000
 diff --git a/scipy/stats/meson.build b/scipy/stats/meson.build
 index a9f9365..99dd282 100644
 --- a/scipy/stats/meson.build
@@ -864,13 +619,3 @@ index a9f9365..99dd282 100644
    ],
    cpp_args: ['-DR_BUILD', cython_cpp_args],
    include_directories: ['libnpyrandom'],
-diff --git a/scipy/stats/tests/__init__.py b/scipy/stats/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/subprojects/highs/docs/c_api_gen/HConfig.h b/subprojects/highs/docs/c_api_gen/HConfig.h
-deleted file mode 100644
-index 0f1329b..0000000
---- a/subprojects/highs/docs/c_api_gen/HConfig.h
-+++ /dev/null
-@@ -1 +0,0 @@
--// A dummy file to fix a warning when Julia parses the C API.
