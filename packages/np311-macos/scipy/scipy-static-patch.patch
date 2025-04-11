@@ -1,132 +1,5 @@
-diff --git a/benchmarks/benchmarks/tests/__init__.py b/benchmarks/benchmarks/tests/__init__.py
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/scipy/_lib/meson.build b/scipy/_lib/meson.build
-index 8c7f56c..6b8b766 100644
---- a/scipy/_lib/meson.build
-+++ b/scipy/_lib/meson.build
-@@ -42,15 +42,6 @@ py3.extension_module('_ccallback_c',
-   subdir: 'scipy/_lib'
- )
- 
--py3.extension_module('_test_ccallback',
--  'src/_test_ccallback.c',
--  dependencies: ccallback_dep,
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/_lib',
--  install_tag: 'tests'
--)
--
- py3.extension_module('_fpumode',
-   '_fpumode.c',
-   include_directories: 'src',
-@@ -59,26 +50,6 @@ py3.extension_module('_fpumode',
-   subdir: 'scipy/_lib'
- )
- 
--py3.extension_module('_test_deprecation_call',
--  cython_gen.process('_test_deprecation_call.pyx'),
--  c_args: cython_c_args,
--  include_directories: 'src',
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/_lib',
--  install_tag: 'tests'
--)
--
--py3.extension_module('_test_deprecation_def',
--  cython_gen.process('_test_deprecation_def.pyx'),
--  c_args: cython_c_args,
--  include_directories: 'src',
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/_lib',
--  install_tag: 'tests'
--)
--
- # May be easier as a compile flag, but use a config header file to stay
- # in sync with what is done in setup.py
- # TODO: the `prefix` here is recommended in
-@@ -257,4 +228,3 @@ py3.install_sources(
- )
- 
- subdir('_uarray')
--subdir('tests')
-diff --git a/scipy/cluster/meson.build b/scipy/cluster/meson.build
-index 8a0e676..1da1a24 100644
---- a/scipy/cluster/meson.build
-+++ b/scipy/cluster/meson.build
-@@ -34,4 +34,3 @@ py3.install_sources([
-   subdir: 'scipy/cluster'
- )
- 
--subdir('tests')
-diff --git a/scipy/constants/meson.build b/scipy/constants/meson.build
-index 249f5eb..d842720 100644
---- a/scipy/constants/meson.build
-+++ b/scipy/constants/meson.build
-@@ -12,4 +12,3 @@ py3.install_sources(
-   subdir: 'scipy/constants'
- )
- 
--subdir('tests')
-diff --git a/scipy/datasets/meson.build b/scipy/datasets/meson.build
-index 1013772..eec2fee 100644
---- a/scipy/datasets/meson.build
-+++ b/scipy/datasets/meson.build
-@@ -11,4 +11,3 @@ py3.install_sources(
-   subdir: 'scipy/datasets'
- )
- 
--subdir('tests')
-diff --git a/scipy/differentiate/meson.build b/scipy/differentiate/meson.build
-index 54e4dd0..28925f7 100644
---- a/scipy/differentiate/meson.build
-+++ b/scipy/differentiate/meson.build
-@@ -8,4 +8,3 @@ py3.install_sources(
-   subdir: 'scipy/differentiate'
- )
- 
--subdir('tests')
-diff --git a/scipy/fft/_pocketfft/meson.build b/scipy/fft/_pocketfft/meson.build
-index f142af8..809b569 100644
---- a/scipy/fft/_pocketfft/meson.build
-+++ b/scipy/fft/_pocketfft/meson.build
-@@ -52,4 +52,3 @@ py3.install_sources(
-   subdir: 'scipy/fft/_pocketfft'
- )
- 
--subdir('tests')
-diff --git a/scipy/fft/meson.build b/scipy/fft/meson.build
-index f5f22dc..a3b7944 100644
---- a/scipy/fft/meson.build
-+++ b/scipy/fft/meson.build
-@@ -18,4 +18,3 @@ py3.install_sources(
- )
- 
- subdir('_pocketfft')
--subdir('tests')
-diff --git a/scipy/fftpack/meson.build b/scipy/fftpack/meson.build
-index d190213..3e6fb4e 100644
---- a/scipy/fftpack/meson.build
-+++ b/scipy/fftpack/meson.build
-@@ -26,4 +26,3 @@ py3.install_sources(
-   subdir: 'scipy/fftpack'
- )
- 
--subdir('tests')
-diff --git a/scipy/integrate/_ivp/meson.build b/scipy/integrate/_ivp/meson.build
-index 840dae6..39360b2 100644
---- a/scipy/integrate/_ivp/meson.build
-+++ b/scipy/integrate/_ivp/meson.build
-@@ -12,4 +12,3 @@ py3.install_sources([
-   subdir: 'scipy/integrate/_ivp'
- )
- 
--subdir('tests')
 diff --git a/scipy/integrate/meson.build b/scipy/integrate/meson.build
-index 206d504..c4f58c5 100644
+index 206d504..59c4d9e 100644
 --- a/scipy/integrate/meson.build
 +++ b/scipy/integrate/meson.build
 @@ -82,7 +82,7 @@ py3.extension_module('_odepack',
@@ -156,38 +29,8 @@ index 206d504..c4f58c5 100644
    dependencies: [fortranobject_dep],
    link_args: version_link_args,
    install: true,
-@@ -112,29 +112,8 @@ py3.extension_module('_dop',
-   subdir: 'scipy/integrate'
- )
- 
--py3.extension_module('_test_multivariate',
--  [quadpack_test_src],
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/integrate',
--  install_tag: 'tests'
--)
--
--py3.extension_module('_test_odeint_banded',
--  ['tests/banded5x5.f', f2py_gen.process('tests/test_odeint_banded.pyf')],
--  link_with: [lsoda_lib, mach_lib],
--  fortran_args: _fflag_Wno_unused_dummy_argument,
--  link_args: version_link_args,
--  dependencies: [lapack_dep, fortranobject_dep],
--  install: true,
--  link_language: 'fortran',
--  subdir: 'scipy/integrate',
--  install_tag: 'tests'
--)
--
- subdir('_ivp')
- subdir('_rules')
--subdir('tests')
- 
- py3.install_sources([
-     '__init__.py',
 diff --git a/scipy/interpolate/meson.build b/scipy/interpolate/meson.build
-index 72e2d20..5d226d8 100644
+index 72e2d20..710eb04 100644
 --- a/scipy/interpolate/meson.build
 +++ b/scipy/interpolate/meson.build
 @@ -165,7 +165,7 @@ py3.extension_module('_fitpack',
@@ -199,71 +42,8 @@ index 72e2d20..5d226d8 100644
    link_args: version_link_args,
    dependencies: [lapack_dep, fortranobject_dep],
    link_with: [fitpack_lib],
-@@ -220,4 +220,3 @@ py3.install_sources([
-   subdir: 'scipy/interpolate'
- )
- 
--subdir('tests')
-diff --git a/scipy/io/_harwell_boeing/meson.build b/scipy/io/_harwell_boeing/meson.build
-index c4172f3..f339139 100644
---- a/scipy/io/_harwell_boeing/meson.build
-+++ b/scipy/io/_harwell_boeing/meson.build
-@@ -6,4 +6,3 @@ py3.install_sources([
-   subdir: 'scipy/io/_harwell_boeing'
- )
- 
--subdir('tests')
-diff --git a/scipy/io/arff/meson.build b/scipy/io/arff/meson.build
-index 1aa19e5..5b15998 100644
---- a/scipy/io/arff/meson.build
-+++ b/scipy/io/arff/meson.build
-@@ -6,4 +6,3 @@ py3.install_sources([
-   subdir: 'scipy/io/arff'
- )
- 
--subdir('tests')
-diff --git a/scipy/io/matlab/meson.build b/scipy/io/matlab/meson.build
-index b963207..251b4a5 100644
---- a/scipy/io/matlab/meson.build
-+++ b/scipy/io/matlab/meson.build
-@@ -45,4 +45,3 @@ py3.install_sources([
-   subdir: 'scipy/io/matlab'
- )
- 
--subdir('tests')
-diff --git a/scipy/io/meson.build b/scipy/io/meson.build
-index 60f71c6..250eef2 100644
---- a/scipy/io/meson.build
-+++ b/scipy/io/meson.build
-@@ -1,18 +1,3 @@
--py3.extension_module('_test_fortran',
--  [
--    f2py_gen.process('test_fortran.pyf'),
--    '_test_fortran.f'
--  ],
--  c_args: [Wno_unused_variable],
--  fortran_args: fortran_ignore_warnings,
--  link_args: version_link_args,
--  dependencies: [lapack_dep, fortranobject_dep],
--  install: true,
--  link_language: 'fortran',
--  subdir: 'scipy/io',
--  install_tag: 'tests'
--)
--
- py3.install_sources([
-     '__init__.py',
-     '_fortran.py',
-@@ -28,7 +13,6 @@ py3.install_sources([
-   subdir: 'scipy/io'
- )
- 
--subdir('tests')
- subdir('matlab')
- subdir('arff')
- subdir('_harwell_boeing')
 diff --git a/scipy/linalg/meson.build b/scipy/linalg/meson.build
-index 95925a7..37eccfb 100644
+index 95925a7..5f7265e 100644
 --- a/scipy/linalg/meson.build
 +++ b/scipy/linalg/meson.build
 @@ -68,6 +68,7 @@ py3.extension_module('_fblas',
@@ -283,11 +63,6 @@ index 95925a7..37eccfb 100644
    link_args: version_link_args,
    dependencies: [lapack_dep, blas_dep, fortranobject_dep],
    install: true,
-@@ -297,4 +298,3 @@ py3.install_sources(
- #  install_dir: py3.get_install_dir() / 'scipy/linalg'
- #)
- 
--subdir('tests')
 diff --git a/scipy/meson.build b/scipy/meson.build
 index 73168d8..52c193c 100644
 --- a/scipy/meson.build
@@ -306,47 +81,8 @@ index 73168d8..52c193c 100644
    include_directories: [inc_np, inc_f2py],
  )
  
-diff --git a/scipy/ndimage/meson.build b/scipy/ndimage/meson.build
-index 82f64f6..96c76ba 100644
---- a/scipy/ndimage/meson.build
-+++ b/scipy/ndimage/meson.build
-@@ -42,16 +42,6 @@ py3.extension_module('_ctest',
-   install_tag: 'tests'
- )
- 
--py3.extension_module('_cytest',
--  cython_gen.process('src/_cytest.pyx'),
--  c_args: cython_c_args,
--  dependencies: np_dep,
--  link_args: version_link_args,
--  install: true,
--  subdir: 'scipy/ndimage',
--  install_tag: 'tests'
--)
--
- 
- python_sources = [
-   '__init__.py',
-diff --git a/scipy/odr/meson.build b/scipy/odr/meson.build
-index c7f53bc..6f99884 100644
---- a/scipy/odr/meson.build
-+++ b/scipy/odr/meson.build
-@@ -35,4 +35,3 @@ py3.install_sources(
-   subdir: 'scipy/odr'
- )
- 
--subdir('tests')
-diff --git a/scipy/optimize/_trustregion_constr/meson.build b/scipy/optimize/_trustregion_constr/meson.build
-index 8aebed6..b087554 100644
---- a/scipy/optimize/_trustregion_constr/meson.build
-+++ b/scipy/optimize/_trustregion_constr/meson.build
-@@ -1,4 +1,3 @@
--subdir('tests')
- 
- py3.install_sources([
-     '__init__.py',
 diff --git a/scipy/optimize/meson.build b/scipy/optimize/meson.build
-index 519755e..224fd2b 100644
+index 519755e..5b31a60 100644
 --- a/scipy/optimize/meson.build
 +++ b/scipy/optimize/meson.build
 @@ -87,7 +87,7 @@ py3.extension_module('_moduleTNC',
@@ -366,77 +102,6 @@ index 519755e..224fd2b 100644
    install: true,
    link_language: 'fortran',
    subdir: 'scipy/optimize'
-@@ -171,7 +172,6 @@ subdir('_trustregion_constr')
- subdir('cython_optimize')
- subdir('_shgo_lib')
- subdir('_highspy')
--subdir('tests')
- 
- 
- py3.install_sources([
-diff --git a/scipy/signal/meson.build b/scipy/signal/meson.build
-index c1e91b3..84d2a94 100644
---- a/scipy/signal/meson.build
-+++ b/scipy/signal/meson.build
-@@ -94,4 +94,3 @@ py3.install_sources([
- )
- 
- subdir('windows')
--subdir('tests')
-diff --git a/scipy/sparse/csgraph/meson.build b/scipy/sparse/csgraph/meson.build
-index 21d691b..adaac13 100644
---- a/scipy/sparse/csgraph/meson.build
-+++ b/scipy/sparse/csgraph/meson.build
-@@ -36,4 +36,3 @@ py3.install_sources(
-   subdir: 'scipy/sparse/csgraph'
- )
- 
--subdir('tests')
-diff --git a/scipy/sparse/linalg/_dsolve/meson.build b/scipy/sparse/linalg/_dsolve/meson.build
-index 14ae6d0..f41517d 100644
---- a/scipy/sparse/linalg/_dsolve/meson.build
-+++ b/scipy/sparse/linalg/_dsolve/meson.build
-@@ -218,4 +218,3 @@ py3.install_sources([
-   subdir: 'scipy/sparse/linalg/_dsolve'
- )
- 
--subdir('tests')
-diff --git a/scipy/sparse/linalg/_eigen/arpack/meson.build b/scipy/sparse/linalg/_eigen/arpack/meson.build
-index 52c8ab9..708657c 100644
---- a/scipy/sparse/linalg/_eigen/arpack/meson.build
-+++ b/scipy/sparse/linalg/_eigen/arpack/meson.build
-@@ -119,4 +119,3 @@ py3.install_sources([
-   subdir: 'scipy/sparse/linalg/_eigen/arpack'
- )
- 
--subdir('tests')
-diff --git a/scipy/sparse/linalg/_eigen/lobpcg/meson.build b/scipy/sparse/linalg/_eigen/lobpcg/meson.build
-index e33952f..553c99d 100644
---- a/scipy/sparse/linalg/_eigen/lobpcg/meson.build
-+++ b/scipy/sparse/linalg/_eigen/lobpcg/meson.build
-@@ -5,4 +5,3 @@ py3.install_sources([
-   subdir: 'scipy/sparse/linalg/_eigen/lobpcg'
- )
- 
--subdir('tests')
-diff --git a/scipy/sparse/linalg/_eigen/meson.build b/scipy/sparse/linalg/_eigen/meson.build
-index 7d6228b..deae628 100644
---- a/scipy/sparse/linalg/_eigen/meson.build
-+++ b/scipy/sparse/linalg/_eigen/meson.build
-@@ -8,4 +8,3 @@ py3.install_sources([
- 
- subdir('arpack')
- subdir('lobpcg')
--subdir('tests')
-diff --git a/scipy/sparse/linalg/_isolve/meson.build b/scipy/sparse/linalg/_isolve/meson.build
-index aec76ef..c9ab128 100644
---- a/scipy/sparse/linalg/_isolve/meson.build
-+++ b/scipy/sparse/linalg/_isolve/meson.build
-@@ -12,4 +12,3 @@ py3.install_sources([
-   subdir: 'scipy/sparse/linalg/_isolve'
- )
- 
--subdir('tests')
 diff --git a/scipy/sparse/linalg/_propack/meson.build b/scipy/sparse/linalg/_propack/meson.build
 index d33cdc0..080cfd8 100644
 --- a/scipy/sparse/linalg/_propack/meson.build
@@ -457,43 +122,6 @@ index d33cdc0..080cfd8 100644
      fortran_args: _fflag_Wno_maybe_uninitialized,
      dependencies: [lapack_dep, blas_dep, fortranobject_dep],
      link_args: version_link_args,
-diff --git a/scipy/sparse/linalg/meson.build b/scipy/sparse/linalg/meson.build
-index e201ae1..0bb0d86 100644
---- a/scipy/sparse/linalg/meson.build
-+++ b/scipy/sparse/linalg/meson.build
-@@ -20,4 +20,3 @@ subdir('_propack')
- subdir('_isolve')
- subdir('_dsolve')
- subdir('_eigen')
--subdir('tests')
-diff --git a/scipy/sparse/meson.build b/scipy/sparse/meson.build
-index 86e7f4a..f83c9d6 100644
---- a/scipy/sparse/meson.build
-+++ b/scipy/sparse/meson.build
-@@ -58,4 +58,3 @@ py3.install_sources(
- subdir('sparsetools')
- subdir('csgraph')
- subdir('linalg')
--subdir('tests')
-diff --git a/scipy/spatial/meson.build b/scipy/spatial/meson.build
-index 1f46d1c..0e6d7a0 100644
---- a/scipy/spatial/meson.build
-+++ b/scipy/spatial/meson.build
-@@ -134,5 +134,4 @@ py3.install_sources([
-   subdir: 'scipy/spatial'
- )
- 
--subdir('tests')
- subdir('transform')
-diff --git a/scipy/spatial/transform/meson.build b/scipy/spatial/transform/meson.build
-index d53b00d..6bcbb34 100644
---- a/scipy/spatial/transform/meson.build
-+++ b/scipy/spatial/transform/meson.build
-@@ -16,4 +16,3 @@ py3.install_sources([
-   subdir: 'scipy/spatial/transform'
- )
- 
--subdir('tests')
 diff --git a/scipy/special/_ellip_harm_2.pyx b/scipy/special/_ellip_harm_2.pyx
 index e9295c2..8196e88 100644
 --- a/scipy/special/_ellip_harm_2.pyx
@@ -533,7 +161,7 @@ index 8e1ff08..ce867bc 100644
  cimport libc
  
 diff --git a/scipy/special/meson.build b/scipy/special/meson.build
-index 3c42247..5f0033f 100644
+index 3c42247..5d8f44d 100644
 --- a/scipy/special/meson.build
 +++ b/scipy/special/meson.build
 @@ -25,18 +25,12 @@ _ufuncs_pxi_pxd_sources = [
@@ -567,7 +195,7 @@ index 3c42247..5f0033f 100644
    install: true,
    subdir: 'scipy/special',
    install_rpath: '$ORIGIN'
-@@ -234,22 +228,6 @@ py3.extension_module('_comb',
+@@ -234,21 +228,6 @@ py3.extension_module('_comb',
    subdir: 'scipy/special'
  )
  
@@ -586,16 +214,9 @@ index 3c42247..5f0033f 100644
 -  subdir: 'scipy/special',
 -  install_tag: 'tests'
 -)
--
+ 
  # Must use `custom_target`, because `py3.install_sources` does not work with
  # generated sources - see https://github.com/mesonbuild/meson/issues/7372
- npz_files = [
-@@ -389,5 +367,4 @@ py3.install_sources(
-   subdir: 'scipy/special'
- )
- 
--subdir('tests')
- subdir('_precompute')
 diff --git a/scipy/special/xsf/cephes/chbevl.h b/scipy/special/xsf/cephes/chbevl.h
 index caaa74f..3f13222 100644
 --- a/scipy/special/xsf/cephes/chbevl.h
@@ -978,7 +599,7 @@ index c57472f..3a015cc 100644
    cython_gen.process('rcont.pyx'),
    include_directories: ['../libnpyrandom'],
 diff --git a/scipy/stats/meson.build b/scipy/stats/meson.build
-index a9f9365..90ecede 100644
+index a9f9365..99dd282 100644
 --- a/scipy/stats/meson.build
 +++ b/scipy/stats/meson.build
 @@ -37,6 +37,7 @@ py3.extension_module('_mvn',
@@ -998,8 +619,3 @@ index a9f9365..90ecede 100644
    ],
    cpp_args: ['-DR_BUILD', cython_cpp_args],
    include_directories: ['libnpyrandom'],
-@@ -184,4 +185,3 @@ subdir('_levy_stable')
- subdir('_unuran')
- subdir('_rcont')
- 
--subdir('tests')
