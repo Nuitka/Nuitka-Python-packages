@@ -15,6 +15,10 @@ def run(temp_dir: str):
 
     __np__.auto_patch_MD_MT_file(os.path.join(src_dir, "CMakeLists.txt"))
 
+    os.chdir(src_dir)
+    __np__.run_build_tool_exe("patch", "patch.exe", "-p1", "-ui",
+                              os.path.join(os.path.dirname(__file__), "openblas-intel.patch"))
+
     install_dir = os.path.join(temp_dir, "install")
     os.mkdir(install_dir)
     build_dir = os.path.join(temp_dir, "build")
@@ -27,6 +31,7 @@ def run(temp_dir: str):
                               "-DCMAKE_INSTALL_PREFIX=" + install_dir, "-DBUILD_STATIC_LIBS=ON", "-DBUILD_SHARED_LIBS=OFF",
                               "-DBUILD_TESTING=OFF", "-DCMAKE_Fortran_COMPILER=flang-new.exe",
                               "-DCMAKE_CXX_COMPILER=clang-cl.exe", "-DCMAKE_C_COMPILER=clang-cl.exe",
+                              "-DCMAKE_C_FLAGS=-w", "-DCMAKE_CXX_FLAGS=-w",
                               "-DCMAKE_ASM_COMPILE_OPTIONS_MSVC_RUNTIME_LIBRARY_MultiThreaded=", src_dir)
     __np__.run_build_tool_exe("ninja", "ninja.exe", "install")
 
