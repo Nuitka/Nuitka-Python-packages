@@ -1,3 +1,17 @@
+diff --git a/scipy/_lib/pocketfft/pocketfft_hdronly.h b/scipy/_lib/pocketfft/pocketfft_hdronly.h
+index 66eea06..b16e70a 100644
+--- a/scipy/_lib/pocketfft/pocketfft_hdronly.h
++++ b/scipy/_lib/pocketfft/pocketfft_hdronly.h
+@@ -54,6 +54,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #define POCKETFFT_CACHE_SIZE 0
+ #endif
+ 
++#define POCKETFFT_NO_MULTITHREADING
++#define POCKETFFT_NO_VECTORS
++
+ #include <cmath>
+ #include <cstdlib>
+ #include <stdexcept>
 diff --git a/scipy/integrate/meson.build b/scipy/integrate/meson.build
 index 206d504..59c4d9e 100644
 --- a/scipy/integrate/meson.build
