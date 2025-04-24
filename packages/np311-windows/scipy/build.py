@@ -34,7 +34,7 @@ def run(wheel_directory):
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
     env["CFLAGS"] = "/DBYPASS_NP_EMBED"
     env["CXXFLAGS"] = "/DBYPASS_NP_EMBED"
-    __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation",
+    __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation", "-Ccompile-args=-j8",
                            "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", env=env)
 
     wheel_location = glob.glob("scipy-*.whl")[0]
@@ -59,7 +59,6 @@ def run(wheel_directory):
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\stats\\_mvn.lib"), "scipy_stats__mvn_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\fft\\_pocketfft\\pypocketfft.lib"),"scipy_fft__pocketfft_pypocketfft_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\optimize\\_pava_pybind.lib"), "scipy_stats_optimize__pava_pybind_")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\spatial\\_distance_pybind.lib"), "scipy_stats_spatial__distance_pybind_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\optimize\\_highspy\\_highs_options.lib"),"scipy__highspy__highs_options_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\sparse\\linalg\\_propack\\_cpropack.lib"),"scipy_sparse_linalg__propack__cpropack_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy\\sparse\\linalg\\_propack\\_dpropack.lib"),"scipy_sparse_linalg__propack__dpropack_")

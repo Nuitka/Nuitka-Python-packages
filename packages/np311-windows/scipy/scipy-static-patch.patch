@@ -1,3 +1,16 @@
+diff --git a/scipy/_lib/_testutils.py b/scipy/_lib/_testutils.py
+index 8da7e40..9b21b6d 100644
+--- a/scipy/_lib/_testutils.py
++++ b/scipy/_lib/_testutils.py
+@@ -93,7 +93,7 @@ class PytestTester:
+         module = sys.modules[self.module_name]
+         module_path = os.path.abspath(module.__path__[0])
+ 
+-        pytest_args = ['--showlocals', '--tb=short']
++        pytest_args = ['--showlocals', '--tb=short', '--continue-on-collection-errors']
+ 
+         if extra_argv:
+             pytest_args += list(extra_argv)
 diff --git a/scipy/_lib/pocketfft/pocketfft_hdronly.h b/scipy/_lib/pocketfft/pocketfft_hdronly.h
 index 66eea06..b16e70a 100644
 --- a/scipy/_lib/pocketfft/pocketfft_hdronly.h
