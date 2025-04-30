@@ -12,6 +12,9 @@ from wheel.wheelfile import WheelFile
 def run(wheel_directory):
     __np__.setup_compiler_env()
 
+    __np__.run_build_tool_exe("patch", "patch.exe", "-t", "-p1", "-i",
+                              os.path.join(os.path.dirname(__file__), "pillow-static-patch.patch"))
+
     env = os.environ.copy()
     env["JPEG_ROOT"] = __np__.find_dep_root("jpeg")
     env["TIFF_ROOT"] = __np__.find_dep_root("tiff")
