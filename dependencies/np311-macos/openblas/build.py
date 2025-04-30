@@ -19,7 +19,6 @@ def run(temp_dir: str):
     os.chdir(build_dir)
 
     if platform.machine() == "x86_64":
-        print(temp_dir, os.path.join(os.path.dirname(__file__), "openblas-intel.patch"))
         __np__.run("patch", "-p1", "-i",
                                 os.path.join(os.path.dirname(__file__), "openblas-intel.patch"), cwd=src_dir)
 
