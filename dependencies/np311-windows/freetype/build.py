@@ -37,4 +37,5 @@ def run(temp_dir: str):
     __np__.run_build_tool_exe("ninja", "ninja.exe", "install")
 
     __np__.install_dep_libs("freetype", os.path.join(install_dir, "lib", "freetype.lib"))
+    __np__.install_dep_libs("freetype", os.path.join(install_dir, "lib", "cmake"))
     __np__.install_dep_include("freetype", os.path.join(install_dir, "include", "freetype2", "*"))
