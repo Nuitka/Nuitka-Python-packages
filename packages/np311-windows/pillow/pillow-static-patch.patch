@@ -1,3 +1,16 @@
+diff --git a/src/PIL/features.py b/src/PIL/features.py
+index 573f1d4..bb7e71b 100644
+--- a/src/PIL/features.py
++++ b/src/PIL/features.py
+@@ -278,7 +278,7 @@ def pilinfo(out: IO[str] | None = None, supported_formats: bool = True) -> None:
+         file=out,
+     )
+     print(
+-        f"Binary Pillow modules loaded from {os.path.dirname(Image.core.__file__)}",
++        f"Binary Pillow modules loaded from {os.path.dirname(sys.executable)}",
+         file=out,
+     )
+     print("-" * 68, file=out)
 diff --git a/src/Tk/tkImaging.c b/src/Tk/tkImaging.c
 index a36c3e0..a1bab0d 100644
 --- a/src/Tk/tkImaging.c
