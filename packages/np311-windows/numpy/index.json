@@ -11,10 +11,7 @@
         "numpy-static-patch.patch",
         "numpy-post.patch"
       ],
-      "requires": [
-        "setuptools",
-        "packaging",
-        "pyproject-metadata",
+      "build_requires": [
         "meson-python>=0.15.0",
         "Cython>=3.0.6"
       ],

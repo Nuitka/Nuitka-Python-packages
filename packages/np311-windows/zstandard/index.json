@@ -9,7 +9,7 @@
       "files": [
         "build.py"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools"
       ],
       "build_script": "build.py"

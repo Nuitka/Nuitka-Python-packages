@@ -12,7 +12,7 @@
         "build.py",
         "cffi-static-patch.patch"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools"
       ],
       "build_script": "build.py"

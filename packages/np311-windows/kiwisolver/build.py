@@ -14,9 +14,9 @@ def run(wheel_directory):
     __np__.run_build_tool_exe("patch", "patch.exe", "-t", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "kiwisolver-static-patch.patch"))
 
-    __np__.run_with_output(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation")
+    __np__.run_with_output(sys.executable, "setup.py", "bdist_wheel")
 
-    wheel_location = glob.glob("kiwisolver-*.whl")[0]
+    wheel_location = glob.glob(os.path.join("dist", "kiwisolver-*.whl"))[0]
 
     wheel_name = os.path.basename(wheel_location)
     shutil.copy(wheel_location, os.path.join(wheel_directory, wheel_name))

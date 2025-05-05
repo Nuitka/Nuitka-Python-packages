@@ -11,7 +11,7 @@
         "Static_x86_64.patch",
         "Static_arm64.patch"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools"
       ],
       "build_script": "build.py"

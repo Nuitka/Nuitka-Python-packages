@@ -12,7 +12,7 @@
         "1.6.0/build.py",
         "1.6.0/meson-static-patch.patch"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools"
       ],
       "build_script": "build.py"
@@ -29,7 +29,7 @@
         "1.7.0/build.py",
         "1.7.0/meson-static-patch.patch"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools"
       ],
       "build_script": "build.py"

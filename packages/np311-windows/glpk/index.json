@@ -11,7 +11,7 @@
       "files": [
         "build.py"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools",
         "setuptools_scm"
       ],

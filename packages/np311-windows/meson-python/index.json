@@ -12,9 +12,13 @@
         "0.16.0/build.py",
         "0.16.0/meson_python-static-patch.patch"
       ],
-      "requires": [
-        "setuptools",
-        "meson"
+      "build_requires": [
+        "setuptools"
+      ],
+      "dist_requires": [
+        "meson>=1.2.3",
+        "packaging>=23.2",
+        "pyproject-metadata>=0.9.0"
       ],
       "build_script": "build.py"
     },
@@ -30,9 +34,13 @@
         "build.py",
         "meson_python-static-patch.patch"
       ],
-      "requires": [
-        "setuptools",
-        "meson"
+      "build_requires": [
+        "setuptools"
+      ],
+      "dist_requires": [
+        "meson>=1.2.3",
+        "packaging>=23.2",
+        "pyproject-metadata>=0.9.0"
       ],
       "build_script": "build.py"
     }

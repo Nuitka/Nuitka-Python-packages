@@ -12,7 +12,7 @@
         "build.py",
         "pandas-static-patch.patch"
       ],
-      "requires": [
+      "build_requires": [
         "setuptools",
         "meson-python>=0.13.1",
         "meson>=1.2.1",
@@ -20,6 +20,11 @@
         "Cython~=3.0.5",
         "numpy>=2.0",
         "versioneer[toml]"
+      ],
+      "dist_requires": [
+        "numpy>=1.26.0e",
+        "python-dateutil>=2.8.2",
+        "tzdata>=2022.7"
       ],
       "build_script": "build.py"
     }
