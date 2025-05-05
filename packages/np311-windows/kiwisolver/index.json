@@ -4,7 +4,9 @@
       "metadata": {
         "Version": "1.4.7"
       },
-      "build_tools": [],
+      "build_tools": [
+        "patch"
+      ],
       "dependencies": [],
       "files": [
         "1.4.7/build.py",
@@ -20,7 +22,9 @@
       "metadata": {
         "Version": "*"
       },
-      "build_tools": [],
+      "build_tools": [
+        "patch"
+      ],
       "dependencies": [],
       "files": [
         "build.py",
