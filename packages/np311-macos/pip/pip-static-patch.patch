@@ -1,15 +1,3 @@
-diff --git a/src/pip/_internal/resolution/resolvelib/factory.py b/src/pip/_internal/resolution/resolvelib/factory.py
-index 55c11b2..42c75c0 100644
---- a/src/pip/_internal/resolution/resolvelib/factory.py
-+++ b/src/pip/_internal/resolution/resolvelib/factory.py
-@@ -610,6 +610,7 @@ class Factory:
-         hash mismatches. Furthermore, cached wheels at present have
-         nondeterministic contents due to file modification times.
-         """
-+        print(f"get_wheel_cache_entry: {link}, {name}, {self._supported_tags_cache}")
-         if self._wheel_cache is None:
-             return None
-         return self._wheel_cache.get_cache_entry(
 diff --git a/src/pip/_vendor/pyproject_hooks/_in_process/_in_process.py b/src/pip/_vendor/pyproject_hooks/_in_process/_in_process.py
 index d689bab..205672d 100644
 --- a/src/pip/_vendor/pyproject_hooks/_in_process/_in_process.py
