@@ -4,18 +4,16 @@
       "metadata": {
         "Version": "*"
       },
-      "build_tools": [],
-      "dependencies": [
-        "jpeg",
-        "tiff"
+      "build_tools": [
+        "patch"
       ],
+      "dependencies": [],
       "files": [
-        "build.py"
+        "build.py",
+        "pyproject_hooks-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools",
-        "setuptools_scm",
-        "build"
+        "setuptools"
       ],
       "build_script": "build.py"
     }

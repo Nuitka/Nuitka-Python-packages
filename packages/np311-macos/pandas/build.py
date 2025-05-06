@@ -19,9 +19,9 @@ def run(wheel_directory):
     env["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("cmake", "cmake")) + os.pathsep +
                    os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"])
     env["PKG_CONFIG"] = "/disabled"
-    __np__.run_with_output(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation", env=env)
+    __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", env=env)
 
-    wheel_location = glob.glob("pandas-*.whl")[0]
+    wheel_location = glob.glob(os.path.join("dist", "pandas-*.whl"))[0]
 
     wheel_files = []
     with TemporaryDirectory() as tmpdir:

@@ -25,10 +25,10 @@ def run(wheel_directory):
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
     env["FFLAGS"] = "-static-libgcc"
     env["PKG_CONFIG"] = "/disabled"
-    __np__.run(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation",
+    __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation",
                "-Csetup-args=-Dblas=openblas", "-Csetup-args=-Dlapack=openblas", env=env)
 
-    wheel_location = glob.glob("numpy-*.whl")[0]
+    wheel_location = glob.glob(os.path.join("dist", "numpy-*.whl"))[0]
 
     wheel_files = []
     with TemporaryDirectory() as tmpdir:
