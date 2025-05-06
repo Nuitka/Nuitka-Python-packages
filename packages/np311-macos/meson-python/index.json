@@ -11,7 +11,8 @@
         "0.16.0/meson_python-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools"
+        "setuptools", 
+        "build"
       ],
       "dist_requires": [
         "meson>=1.2.3",
@@ -31,7 +32,8 @@
         "meson_python-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools"
+        "setuptools", 
+        "build"
       ],
       "dist_requires": [
         "meson>=1.2.3",
