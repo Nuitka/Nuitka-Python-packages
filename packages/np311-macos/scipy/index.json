@@ -12,6 +12,7 @@
       ],
       "build_requires": [
         "setuptools",
+        "build", 
         "meson-python",
         "pyproject-metadata",
         "Cython>=3.0.8",
