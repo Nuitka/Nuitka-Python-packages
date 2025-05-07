@@ -2,20 +2,20 @@
   "scripts": [
     {
       "metadata": {
-        "Version": "0.16.0"
+        "Version": "0.16.*"
       },
-      "build_tools": [
-        "patch"
-      ],
+      "build_tools": [],
       "dependencies": [],
       "files": [
         "0.16.0/build.py",
         "0.16.0/meson_python-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools"
+        "setuptools",
+        "build"
       ],
       "dist_requires": [
+        "ninja>=1.8.2",
         "meson>=1.2.3",
         "packaging>=23.2",
         "pyproject-metadata>=0.9.0"
@@ -35,9 +35,11 @@
         "meson_python-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools"
+        "setuptools",
+        "build"
       ],
       "dist_requires": [
+        "ninja>=1.8.2",
         "meson>=1.2.3",
         "packaging>=23.2",
         "pyproject-metadata>=0.9.0"

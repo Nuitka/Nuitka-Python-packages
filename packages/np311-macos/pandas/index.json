@@ -17,7 +17,8 @@
         "wheel",
         "Cython~=3.0.5",
         "numpy>=2.0",
-        "versioneer[toml]"
+        "versioneer[toml]",
+        "build"
       ],
       "dist_requires": [
         "numpy>=2.0",

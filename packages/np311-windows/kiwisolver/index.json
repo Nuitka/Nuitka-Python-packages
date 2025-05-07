@@ -13,7 +13,8 @@
         "1.4.7/kiwisolver-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools>=78",
+        "setuptools",
+        "setuptools_scm[toml]>=3.4.3",
         "cppy>=1.3.0",
         "build"
       ],
@@ -32,7 +33,8 @@
         "kiwisolver-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools>=78",
+        "setuptools",
+        "setuptools_scm[toml]>=3.4.3",
         "cppy>=1.3.0",
         "build"
       ],

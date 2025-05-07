@@ -15,9 +15,9 @@ def run(wheel_directory):
     __np__.run_build_tool_exe("patch", "patch.exe", "-t", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "pandas-static-patch.patch"))
 
-    __np__.run_with_output(sys.executable, "-m", "pip", "wheel", ".", "--verbose", "--no-build-isolation")
+    __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation")
 
-    wheel_location = glob.glob("pandas-*.whl")[0]
+    wheel_location = glob.glob(os.path.join("dist", "pandas-*.whl"))[0]
 
     env = os.environ.copy()
     env["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("7zip", "7z.exe")) + os.path.pathsep +

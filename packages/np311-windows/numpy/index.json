@@ -13,7 +13,8 @@
       ],
       "build_requires": [
         "meson-python>=0.15.0",
-        "Cython>=3.0.6"
+        "Cython>=3.0.6",
+        "build"
       ],
       "build_script": "build.py"
     }
