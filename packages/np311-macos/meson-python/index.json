@@ -15,6 +15,7 @@
         "build"
       ],
       "dist_requires": [
+        "ninja>=1.8.2",
         "meson>=1.2.3",
         "packaging>=23.2",
         "pyproject-metadata>=0.9.0"
@@ -36,6 +37,7 @@
         "build"
       ],
       "dist_requires": [
+        "ninja>=1.8.2",
         "meson>=1.2.3",
         "packaging>=23.2",
         "pyproject-metadata>=0.9.0"

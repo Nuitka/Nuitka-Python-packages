@@ -11,6 +11,7 @@
         "1.6.0/meson-static-patch.patch"
       ],
       "build_requires": [
+        "ninja>=1.8.2",
         "setuptools", 
         "build"
       ],
@@ -27,6 +28,7 @@
         "1.7.0/meson-static-patch.patch"
       ],
       "build_requires": [
+        "ninja>=1.8.2",
         "setuptools", 
         "build"
       ],
