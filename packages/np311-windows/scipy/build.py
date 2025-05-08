@@ -37,7 +37,7 @@ def run(wheel_directory):
     __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", "-Ccompile-args=-j6",
                            "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", env=env)
 
-    wheel_location = glob.glob("scipy-*.whl")[0]
+    wheel_location = glob.glob(os.path.join("dist", "scipy-*.whl"))[0]
 
     env["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("7zip", "7z.exe")) + os.path.pathsep +
                    os.path.dirname(__np__.find_build_tool_exe("mingw", "objdump.exe")) + os.path.pathsep + env["PATH"])
