@@ -27,7 +27,7 @@ def run(wheel_directory):
                            "-C", "tiff=enable", "-C", "zlib=enable", "-C", "freetype=enable", "-C", "harfbuzz=enable",
                            "-C", "raqm=vendor", "-C", "fribidi=vendor", env=env)
 
-    wheel_location = glob.glob("pillow-*.whl")[0]
+    wheel_location = glob.glob(os.path.join("dist", "pillow-*.whl"))[0]
     wheel_name = os.path.basename(wheel_location)
     shutil.copy(wheel_location, os.path.join(wheel_directory, wheel_name))
     return os.path.join(wheel_directory, wheel_name)
