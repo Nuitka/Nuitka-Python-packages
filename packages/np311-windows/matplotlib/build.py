@@ -36,9 +36,10 @@ def run(wheel_directory):
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\_image.lib"), "matplotlib__image_", [".*fflush.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\_path.lib"), "matplotlib__path_", [".*fflush.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\_qhull.lib"), "matplotlib__qhull_", [".*fflush.*"])
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\_tkagg.lib"), "matplotlib__tkagg_", [".*fflush.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\_tri.lib"), "matplotlib__tri_", [".*fflush.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\ft2font.lib"), "matplotlib_ft2font_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\backends\\_backend_agg.lib"), "matplotlib__backend_agg_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib\\backends\\_tkagg.lib"), "matplotlib__tkagg_", [".*fflush.*"])
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)

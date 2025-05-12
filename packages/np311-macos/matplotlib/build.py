@@ -37,6 +37,8 @@ def run(wheel_directory):
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_qhull.nuitkapython-311-darwin.a"), "matplotlib__qhull_", [".*fflush.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_tri.nuitkapython-311-darwin.a"), "matplotlib__tri_", [".*fflush.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/ft2font.nuitkapython-311-darwin.a"), "matplotlib_ft2font_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/backends/_backend_agg.lib"), "matplotlib__backend_agg_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/backends/_tkagg.lib"), "matplotlib__tkagg_", [".*fflush.*"])
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)
