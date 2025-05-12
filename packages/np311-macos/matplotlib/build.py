@@ -25,6 +25,22 @@ def run(wheel_directory):
 
     wheel_location = glob.glob(os.path.join("dist", "matplotlib-*.whl"))[0]
 
+    wheel_files = []
+    with TemporaryDirectory() as tmpdir:
+        with WheelFile(wheel_location) as wf:
+            for filename in wf.namelist():
+                wheel_files.append(filename)
+                wf.extract(filename, tmpdir)
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_c_internal_utils.nuitkapython-311-darwin.a"), "matplotlib__c_internal_utils_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_image.nuitkapython-311-darwin.a"), "matplotlib__image_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_path.nuitkapython-311-darwin.a"), "matplotlib__path_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_qhull.nuitkapython-311-darwin.a"), "matplotlib__qhull_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/_tri.nuitkapython-311-darwin.a"), "matplotlib__tri_", [".*fflush.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "matplotlib/ft2font.nuitkapython-311-darwin.a"), "matplotlib_ft2font_", [".*fflush.*"])
+        with WheelFile(wheel_location, 'w') as wf:
+            for filename in wheel_files:
+                wf.write(os.path.join(tmpdir, filename), filename)
+
     wheel_name = os.path.basename(wheel_location)
     shutil.copy(wheel_location, os.path.join(wheel_directory, wheel_name))
     return os.path.join(wheel_directory, wheel_name)
