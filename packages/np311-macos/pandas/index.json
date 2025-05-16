@@ -23,7 +23,8 @@
       "dist_requires": [
         "numpy>=2.0",
         "python-dateutil>=2.8.2",
-        "tzdata>=2022.7"
+        "tzdata>=2022.7",
+        "pytz>=2020.1"
       ],
       "build_script": "build.py"
     }
