@@ -1,8 +1,6 @@
 {
   "version": "19.1.6",
-  "build_tools": [
-    "miniconda"
-  ],
+  "build_tools": [ ],
   "files": [
     "build.py"
   ],
