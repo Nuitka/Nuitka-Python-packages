@@ -23,7 +23,7 @@ def run(wheel_directory):
     env["LIB"] = env["LIB"] + os.pathsep + __np__.find_dep_libs("openblas")
     env["INCLUDE"] = env["INCLUDE"] + os.pathsep + __np__.find_dep_include("openblas")
     __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation",
-               "-Csetup-args=-Dblas=openblas", "-Csetup-args=-Dlapack=openblas", "-Csetup-args=-Dbuildtype=debug", env=env)
+               "-Csetup-args=-Dblas=openblas", "-Csetup-args=-Dlapack=openblas", env=env)
 
     wheel_location = glob.glob(os.path.join("dist", "numpy-*.whl"))[0]
 
