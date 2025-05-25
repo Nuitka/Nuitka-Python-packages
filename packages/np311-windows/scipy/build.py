@@ -35,7 +35,7 @@ def run(wheel_directory):
     env["CFLAGS"] = "/DBYPASS_NP_EMBED"
     env["CXXFLAGS"] = "/DBYPASS_NP_EMBED"
     __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", "-Ccompile-args=-j6",
-                           "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", env=env)
+                           "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", "-Csetup-args=-Dbuildtype=debug", env=env)
 
     wheel_location = glob.glob(os.path.join("dist", "scipy-*.whl"))[0]
 

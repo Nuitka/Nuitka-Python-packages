@@ -15,7 +15,7 @@ def run(wheel_directory):
     __np__.run_build_tool_exe("patch", "patch.exe", "-t", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "pandas-static-patch.patch"))
 
-    __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation")
+    __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", "-Csetup-args=-Dbuildtype=debug")
 
     wheel_location = glob.glob(os.path.join("dist", "pandas-*.whl"))[0]
 

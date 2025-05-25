@@ -20,7 +20,7 @@ def run(wheel_directory):
     os.environ["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("freetype")
 
     __np__.run_with_output(sys.executable, "-m", "build", "-w", "--no-isolation",
-                           "-Csetup-args=-Dsystem-freetype=True")
+                           "-Csetup-args=-Dsystem-freetype=True", "-Csetup-args=-Dbuildtype=debug")
 
     wheel_location = glob.glob(os.path.join("dist", "matplotlib-*.whl"))[0]
 
