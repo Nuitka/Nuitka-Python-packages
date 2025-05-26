@@ -1,3 +1,62 @@
+diff --git a/mesonbuild/backend/ninjabackend.py b/mesonbuild/backend/ninjabackend.py
+index b78ad07..bd63c2f 100644
+--- a/mesonbuild/backend/ninjabackend.py
++++ b/mesonbuild/backend/ninjabackend.py
+@@ -4,6 +4,7 @@
+ 
+ from __future__ import annotations
+ 
++import sys
+ from collections import OrderedDict
+ from dataclasses import dataclass
+ from enum import Enum, unique
+@@ -1081,6 +1082,25 @@ class NinjaBackend(backends.Backend):
+         elem = self.generate_link(target, outname, final_obj_list, linker, pch_objects, stdlib_args=stdlib_args)
+         self.generate_dependency_scan_target(target, compiled_sources, source2object, generated_source_files, fortran_order_deps)
+         self.add_build(elem)
++
++        if isinstance(target, build.StaticLibrary):
++            if elem.outfilenames:  # elem is the NinjaBuildElement from self.generate_link()
++                linked_library_path = elem.outfilenames[0]  # Path to the .so/.pyd file
++
++                # 4. Create a new NinjaBuildElement for your custom command.
++                post_link_elem = NinjaBuildElement(
++                    all_outputs=self.all_outputs,  # Use the existing set of all outputs
++                    outfilenames=[linked_library_path + ".stamp"],
++                    rulename='rename_pyinit_symbols',
++                    infilenames=[linked_library_path]  # Depends on the successfully linked library
++                )
++
++                # Add any specific variables your NinjaRule might expect (e.g., if your rule uses $TARGET_NAME)
++                # post_link_elem.add_item('TARGET_NAME', target.name)
++
++                # 5. Add this new element to the build.
++                self.add_build(post_link_elem)
++
+         #In AIX, we archive shared libraries. If the instance is a shared library, we add a command to archive the shared library
+         #object and create the build element.
+         if isinstance(target, build.SharedLibrary) and self.environment.machines[target.for_machine].is_aix():
+@@ -1352,6 +1372,11 @@ class NinjaBackend(backends.Backend):
+         self.add_rule_comment(NinjaComment('Rules for linking.'))
+         self.generate_static_link_rules()
+         self.generate_dynamic_link_rules()
++        self.add_rule(NinjaRule('rename_pyinit_symbols',
++                                [sys.executable, "-m", "__np__.tools.rename_init", '$in', '$out'],  # Command
++                                [],  # rspable args (empty for this example)
++                                'Running PyInit rename script on $in',
++                                extra='restat = 1'))
+         self.add_rule_comment(NinjaComment('Other rules'))
+         # Ninja errors out if you have deps = gcc but no depfile, so we must
+         # have two rules for custom commands.
+@@ -3719,6 +3744,8 @@ https://gcc.gnu.org/bugzilla/show_bug.cgi?id=47485'''))
+                         linker, stdlib_args = t.get_clink_dynamic_linker_and_stdlibs()
+                         t.get_outputs()[0] = linker.get_archive_name(t.get_outputs()[0])
+                 targetlist.append(os.path.join(self.get_target_dir(t), t.get_outputs()[0]))
++                if isinstance(t, build.StaticLibrary):
++                    targetlist.append(os.path.join(self.get_target_dir(t), t.get_outputs()[0]) + ".stamp")
+ 
+             elem = NinjaBuildElement(self.all_outputs, targ, 'phony', targetlist)
+             self.add_build(elem)
 diff --git a/mesonbuild/build.py b/mesonbuild/build.py
 index cf71dc2..423b008 100644
 --- a/mesonbuild/build.py
