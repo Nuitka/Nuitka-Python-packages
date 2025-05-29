@@ -7,7 +7,8 @@
       "build_tools": [
         "patch",
         "cmake",
-        "ninja"
+        "ninja",
+        "mingw"
       ],
       "dependencies": [
         "freetype"
