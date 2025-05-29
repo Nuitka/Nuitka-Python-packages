@@ -24,8 +24,6 @@ def run(wheel_directory):
 
     wheel_location = glob.glob(os.path.join("dist", "matplotlib-*.whl"))[0]
 
-    os.environ["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("7zip", "7z.exe")) + os.path.pathsep +
-                   os.path.dirname(__np__.find_build_tool_exe("mingw", "objdump.exe")) + os.path.pathsep + os.environ["PATH"])
     wheel_files = []
     with TemporaryDirectory() as tmpdir:
         with WheelFile(wheel_location) as wf:
