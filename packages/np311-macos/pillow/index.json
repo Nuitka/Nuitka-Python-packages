@@ -6,8 +6,7 @@
       },
       "build_tools": [],
       "dependencies": [
-        "jpeg",
-        "tiff"
+        "jpeg"
       ],
       "files": [
         "build.py"

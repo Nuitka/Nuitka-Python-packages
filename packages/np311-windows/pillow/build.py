@@ -24,7 +24,7 @@ def run(wheel_directory):
 
     env["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])
     __np__.run_with_output(sys.executable, "-m", "build", "-w", "--no-isolation", "-C", "jpeg=enable",
-                           "-C", "tiff=enable", "-C", "zlib=enable", "-C", "freetype=enable", "-C", "harfbuzz=enable",
+                           "-C", "tiff=disable", "-C", "zlib=enable", "-C", "freetype=enable", "-C", "harfbuzz=enable",
                            "-C", "raqm=vendor", "-C", "fribidi=vendor", env=env)
 
     wheel_location = glob.glob(os.path.join("dist", "pillow-*.whl"))[0]

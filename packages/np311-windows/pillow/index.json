@@ -9,7 +9,6 @@
       ],
       "dependencies": [
         "jpeg",
-        "tiff",
         "freetype",
         "harfbuzz"
       ],
