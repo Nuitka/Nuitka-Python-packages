@@ -12,7 +12,8 @@ from wheel.wheelfile import WheelFile
 def run(wheel_directory):
     __np__.setup_compiler_env()
 
-    __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", "-Ccompile-args=-j3")
+    with TemporaryDirectory() as temp_dir:
+        __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", "-Ccompile-args=-j3", "-Cbuild-dir=" + temp_dir)
 
     wheel_location = glob.glob(os.path.join("dist", "scikit_learn-*.whl"))[0]
 
