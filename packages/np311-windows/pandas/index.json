@@ -9,8 +9,7 @@
       ],
       "dependencies": [],
       "files": [
-        "build.py",
-        "pandas-static-patch.patch"
+        "build.py"
       ],
       "build_requires": [
         "setuptools",

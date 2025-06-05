@@ -10,9 +10,6 @@ from wheel.wheelfile import WheelFile
 
 
 def run(wheel_directory):
-    __np__.run_with_output("patch", "-t", "-p1", "-i",
-                              os.path.join(os.path.dirname(__file__), "pandas-static-patch.patch"))
-
     env = os.environ.copy()
     env["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
     env["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])
