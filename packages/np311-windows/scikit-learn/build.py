@@ -27,10 +27,10 @@ def run(wheel_directory):
             for filename in wf.namelist():
                 wheel_files.append(filename)
                 wf.extract(filename, tmpdir)
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_libsvm_sparse.lib"), "sklearn_svm__libsvm_sparse_")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_libsvm.lib"), "sklearn_svm__libsvm_")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_libsvm_sparse.lib"), "sklearn_svm__libsvm_sparse_", [".*fflush.*", ".*fputs.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_libsvm.lib"), "sklearn_svm__libsvm_", [".*fflush.*", ".*fputs.*"])
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_newrand.lib"), "sklearn_svm__newrand_")
-        __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_liblinear.lib"), "sklearn_svm__liblinear_")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn\\svm\\_liblinear.lib"), "sklearn_svm__liblinear_", [".*fflush.*", ".*fputs.*"])
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)
