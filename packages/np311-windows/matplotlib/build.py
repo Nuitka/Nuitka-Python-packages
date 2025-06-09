@@ -3,10 +3,9 @@ import glob
 import shutil
 import sys
 import os
+import sysconfig
 import setuptools.build_meta
 from tempfile import TemporaryDirectory
-
-import mesonpy
 
 from wheel.wheelfile import WheelFile
 
@@ -17,10 +16,16 @@ def run(wheel_directory):
     __np__.run_build_tool_exe("patch", "patch.exe", "-t", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "matplotlib-static-patch.patch"))
 
-    os.environ["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("freetype")
+    __np__.patchAllSource(os.getcwd())
 
+    os.environ["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("freetype")
+    os.environ["INCLUDE"] = os.environ["INCLUDE"] + os.pathsep + sysconfig.get_config_var("INCLUDEPY")
+
+    job_args = []
+    if "NP_JOBS" in os.environ:
+        job_args += ["-Ccompile-args=-j" + os.environ["NP_JOBS"]]
     __np__.run_with_output(sys.executable, "-m", "build", "-w", "--no-isolation",
-                           "-Csetup-args=-Dsystem-freetype=True")
+                           "-Csetup-args=-Dsystem-freetype=True", *job_args)
 
     wheel_location = glob.glob(os.path.join("dist", "matplotlib-*.whl"))[0]
 

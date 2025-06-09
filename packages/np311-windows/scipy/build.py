@@ -34,8 +34,11 @@ def run(wheel_directory):
     env["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("openblas")
     env["CFLAGS"] = "/DBYPASS_NP_EMBED"
     env["CXXFLAGS"] = "/DBYPASS_NP_EMBED"
+    job_args = []
+    if "NP_JOBS" in env:
+        job_args += ["-Ccompile-args=-j" + env["NP_JOBS"]]
     __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation", "-Ccompile-args=-j6",
-                           "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", env=env)
+                           "-Csetup-args=-Dprefer_static=True", "-Csetup-args=-Db_vscrt=mt", *job_args, env=env)
 
     wheel_location = glob.glob(os.path.join("dist", "scipy-*.whl"))[0]
 

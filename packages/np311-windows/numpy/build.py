@@ -18,12 +18,15 @@ def run(wheel_directory):
 
     __np__.filter_paths_containing("gfortran.exe")
     env = os.environ.copy()
+    job_args = []
+    if "NP_JOBS" in env:
+        job_args += ["-Ccompile-args=-j" + env["NP_JOBS"]]
     env["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])
     env["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + env["PATH"]
     env["LIB"] = env["LIB"] + os.pathsep + __np__.find_dep_libs("openblas")
     env["INCLUDE"] = env["INCLUDE"] + os.pathsep + __np__.find_dep_include("openblas")
     __np__.run(sys.executable, "-m", "build", "-w", "--no-isolation",
-               "-Csetup-args=-Dblas=openblas", "-Csetup-args=-Dlapack=openblas", env=env)
+               "-Csetup-args=-Dblas=openblas", "-Csetup-args=-Dlapack=openblas", *job_args, env=env)
 
     wheel_location = glob.glob(os.path.join("dist", "numpy-*.whl"))[0]
 
