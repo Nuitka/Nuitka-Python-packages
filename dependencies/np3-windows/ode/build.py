@@ -7,7 +7,7 @@ import glob
 
 
 def run(temp_dir: str):
-    __np__.download_extract("https://bitbucket.org/odedevs/ode/downloads/ode-0.16.2.tar.gz", temp_dir)
+    __np__.download_extract("https://bitbucket.org/odedevs/ode/get/0.16.2.tar.gz", temp_dir)
 
     __np__.setup_compiler_env()
 
