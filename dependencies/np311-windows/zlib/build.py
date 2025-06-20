@@ -10,7 +10,7 @@ def run(temp_dir: str):
 
     __np__.setup_compiler_env()
 
-    __np__.auto_patch_MD_MT(os.path.join(temp_dir, "zlib-1.2.12", "win32"))
+    __np__.auto_patch_build(os.path.join(temp_dir, "zlib-1.2.12", "win32"))
 
     os.chdir(os.path.join(temp_dir, "zlib-1.2.12"))
 

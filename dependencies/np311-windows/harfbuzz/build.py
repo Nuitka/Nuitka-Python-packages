@@ -17,7 +17,8 @@ def run(temp_dir: str):
 
     ft_src_dir = glob.glob(os.path.join(ft_dir, "freetype*"))[0]
 
-    __np__.auto_patch_MD_MT(ft_src_dir)
+    __np__.auto_patch_build(ft_src_dir)
+    __np__.patch_all_source(ft_src_dir)
 
     ft_build_dir = os.path.join(ft_dir, "build")
     os.mkdir(ft_build_dir)
@@ -43,7 +44,8 @@ def run(temp_dir: str):
     src_dir = glob.glob(os.path.join(temp_dir, "harfbuzz*"))[0]
     os.chdir(src_dir)
 
-    __np__.auto_patch_MD_MT(src_dir)
+    __np__.auto_patch_build(src_dir)
+    __np__.patch_all_source(src_dir)
 
     build_dir = os.path.join(temp_dir, "build")
     os.mkdir(build_dir)

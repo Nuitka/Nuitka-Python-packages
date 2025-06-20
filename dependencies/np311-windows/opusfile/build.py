@@ -15,7 +15,7 @@ def run(temp_dir: str):
 
     shutil.copy(os.path.join(temp_dir, "libopusfile.cmake"), os.path.join(src_dir, "CMakeLists.txt"))
 
-    __np__.auto_patch_MD_MT(src_dir)
+    __np__.auto_patch_build(src_dir)
 
     build_dir = os.path.join(temp_dir, "build")
     os.mkdir(build_dir)

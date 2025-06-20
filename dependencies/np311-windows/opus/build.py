@@ -15,7 +15,7 @@ def run(temp_dir: str):
 
     src_dir = glob.glob(os.path.join(temp_dir, "opus*"))[0]
 
-    __np__.auto_patch_MD_MT(src_dir)
+    __np__.auto_patch_build(src_dir)
 
     # We have to write this file manually since it is not included in git.
     with open(os.path.join(src_dir, "package_version"), 'w') as f:

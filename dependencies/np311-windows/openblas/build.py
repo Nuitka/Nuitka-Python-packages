@@ -13,7 +13,7 @@ def run(temp_dir: str):
 
     src_dir = glob.glob(os.path.join(temp_dir, "OpenBLAS*"))[0]
 
-    __np__.auto_patch_MD_MT_file(os.path.join(src_dir, "CMakeLists.txt"))
+    __np__.auto_patch_build_file(os.path.join(src_dir, "CMakeLists.txt"))
 
     os.chdir(src_dir)
     __np__.run_build_tool_exe("patch", "patch.exe", "-p1", "-ui",

@@ -16,7 +16,8 @@ def run(temp_dir: str):
 
     os.environ["PATH"] = os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja.exe")) + os.pathsep + os.environ["PATH"]
 
-    __np__.auto_patch_MD_MT(src_dir)
+    __np__.auto_patch_build(src_dir)
+    __np__.patch_all_source(src_dir)
 
     build_dir = os.path.join(temp_dir, "build")
     os.mkdir(build_dir)

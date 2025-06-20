@@ -14,7 +14,7 @@ def run(temp_dir: str):
 
     __np__.setup_compiler_env()
 
-    __np__.auto_patch_MD_MT(src_dir)
+    __np__.auto_patch_build(src_dir)
 
     build_dir = os.path.join(temp_dir, "build")
     os.mkdir(build_dir)

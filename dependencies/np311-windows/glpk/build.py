@@ -17,7 +17,7 @@ def run(temp_dir: str):
     __np__.run_build_tool_exe("patch", "patch.exe", "--binary", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "glpk.patch"))
 
-    __np__.auto_patch_MD_MT_file(os.path.join(src_dir, "CMakeLists.txt"))
+    __np__.auto_patch_build_file(os.path.join(src_dir, "CMakeLists.txt"))
 
     install_dir = os.path.join(temp_dir, "install")
     os.mkdir(install_dir)
