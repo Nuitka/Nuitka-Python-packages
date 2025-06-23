@@ -3,6 +3,7 @@ import glob
 import shutil
 import sys
 import os
+import sysconfig
 import setuptools.build_meta
 from tempfile import TemporaryDirectory
 
@@ -15,8 +16,13 @@ def run(wheel_directory):
     __np__.run_with_output("patch", "-t", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "matplotlib-static-patch.patch"))
 
+    __np__.patch_all_source(os.getcwd())
+
     os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
     os.environ["CMAKE_PREFIX_PATH"] = __np__.find_dep_root("freetype")
+    os.environ["INCLUDE"] = sysconfig.get_config_var("INCLUDEPY")
+    os.environ["CFLAGS"] = "-I" + sysconfig.get_config_var("INCLUDEPY")
+    os.environ["CXXFLAGS"] = "-I" + sysconfig.get_config_var("INCLUDEPY")
     os.environ["PATH"] = (os.path.dirname(__np__.find_build_tool_exe("cmake", "cmake")) + os.pathsep +
                    os.path.dirname(__np__.find_build_tool_exe("ninja", "ninja")) + os.pathsep + os.environ["PATH"])
 

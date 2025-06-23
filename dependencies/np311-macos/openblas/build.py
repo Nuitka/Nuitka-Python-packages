@@ -18,6 +18,8 @@ def run(temp_dir: str):
     os.mkdir(build_dir)
     os.chdir(build_dir)
 
+    __np__.auto_patch_build_file(os.path.join(src_dir, "CMakeLists.txt"))
+
     if platform.machine() == "x86_64":
         __np__.run("patch", "-p1", "-i",
                                 os.path.join(os.path.dirname(__file__), "openblas-intel.patch"), cwd=src_dir)

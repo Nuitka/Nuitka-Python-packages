@@ -10,6 +10,8 @@ from wheel.wheelfile import WheelFile
 
 
 def run(wheel_directory):
+    __np__.patch_all_source(os.getcwd())
+
     env = os.environ.copy()
     env["JPEG_ROOT"] = __np__.find_dep_root("jpeg")
     env["TIFF_ROOT"] = __np__.find_dep_root("tiff")

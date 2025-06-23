@@ -12,7 +12,7 @@
       ],
       "build_requires": [
         "ninja>=1.8.2",
-        "setuptools", 
+        "setuptools",
         "build"
       ],
       "build_script": "build.py"
@@ -29,7 +29,24 @@
       ],
       "build_requires": [
         "ninja>=1.8.2",
-        "setuptools", 
+        "setuptools",
+        "build"
+      ],
+      "build_script": "build.py"
+    },
+    {
+      "metadata": {
+        "Version": "1.8.[0-1]"
+      },
+      "build_tools": [],
+      "dependencies": [],
+      "files": [
+        "1.8.0/build.py",
+        "1.8.0/meson-static-patch.patch"
+      ],
+      "build_requires": [
+        "ninja>=1.8.2",
+        "setuptools",
         "build"
       ],
       "build_script": "build.py"
@@ -41,8 +58,8 @@
       "build_tools": [],
       "dependencies": [],
       "files": [
-        "1.8.0/build.py",
-        "1.8.0/meson-static-patch.patch"
+        "1.8.2/build.py",
+        "1.8.2/meson-static-patch.patch"
       ],
       "build_requires": [
         "ninja>=1.8.2",

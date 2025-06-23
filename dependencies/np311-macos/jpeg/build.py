@@ -20,6 +20,9 @@ def run(temp_dir: str):
     shutil.copy(os.path.join(temp_dir, "libjpeg.cmake"), os.path.join(src_dir, "CMakeLists.txt"))
     shutil.copy(os.path.join(temp_dir, "libjpeg-jconfig.h.cmake"), os.path.join(src_dir, "jconfig.h.cmake"))
 
+    __np__.auto_patch_build(src_dir)
+    __np__.patch_all_source(src_dir)
+
     build_dir = os.path.join(temp_dir, "build")
     os.mkdir(build_dir)
     os.chdir(build_dir)
