@@ -10,7 +10,7 @@
       "dependencies": [],
       "files": [
         "build.py",
-        "cffi-static-patch.patch"
+        "regex-static.patch"
       ],
       "build_requires": [
         "setuptools",
