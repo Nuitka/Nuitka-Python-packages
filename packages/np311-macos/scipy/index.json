@@ -22,7 +22,7 @@
       "dist_requirements": [
         "numpy>=1.25.2"
       ],
-      "build_script": "1.15.0/build.py"
+      "build_script": "build.py"
     },
     {
       "metadata": {
@@ -46,7 +46,7 @@
       "dist_requirements": [
         "numpy>=1.25.2"
       ],
-      "build_script": "1.16.0/build.py"
+      "build_script": "build.py"
     }
   ]
 }
