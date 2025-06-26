@@ -5,10 +5,10 @@ index 442bb53..70d8137 100644
 @@ -93,7 +93,7 @@ class PytestTester:
          module = sys.modules[self.module_name]
          module_path = os.path.abspath(module.__path__[0])
-
+ 
 -        pytest_args = ['--showlocals', '--tb=short']
 +        pytest_args = ['--showlocals', '--tb=short', '--continue-on-collection-errors']
-
+ 
          if extra_argv is None:
              extra_argv = []
 diff --git a/scipy/_lib/pocketfft/pocketfft_hdronly.h b/scipy/_lib/pocketfft/pocketfft_hdronly.h
@@ -19,15 +19,15 @@ index 66eea06..2645a6b 100644
  For the odd-sized DCT-IV transforms:
    Copyright (C) 2003, 2007-14 Matteo Frigo
    Copyright (C) 2003, 2007-14 Massachusetts Institute of Technology
--
+-  
 +
  For the prev_good_size search:
    Copyright (C) 2024 Tan Ping Liang, Peter Bell
-
+ 
 @@ -54,6 +54,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  #define POCKETFFT_CACHE_SIZE 0
  #endif
-
+ 
 +#define POCKETFFT_NO_MULTITHREADING
 +#define POCKETFFT_NO_VECTORS
 +
@@ -38,13 +38,13 @@ index 66eea06..2645a6b 100644
            size_t x = f1175;
            while (x*2 <= n) x *= 2;
            if (x > bestfound) bestfound = x;
--          while (true)
+-          while (true) 
 +          while (true)
            {
              if (x * 3 <= n) x *= 3;
              else if (x % 2 == 0) x /= 2;
              else break;
--
+-              
 +
              if (x > bestfound) bestfound = x;
            }
@@ -53,13 +53,13 @@ index 66eea06..2645a6b 100644
        size_t x = f5;
        while (x*2 <= n) x *= 2;
        if (x > bestfound) bestfound = x;
--      while (true)
+-      while (true) 
 +      while (true)
        {
          if (x * 3 <= n) x *= 3;
          else if (x % 2 == 0) x /= 2;
          else break;
--
+-      
 +
          if (x > bestfound) bestfound = x;
        }
@@ -146,7 +146,7 @@ index 1bc50f5..754dc75 100644
 +  dependencies: py3_dep,
    include_directories: [inc_np, inc_f2py],
  )
-
+ 
 diff --git a/scipy/sparse/linalg/_propack/meson.build b/scipy/sparse/linalg/_propack/meson.build
 index d33cdc0..5c9f69c 100644
 --- a/scipy/sparse/linalg/_propack/meson.build
@@ -167,7 +167,7 @@ index 35ff34c..2e4e472 100644
 @@ -190,15 +190,7 @@ cimport numpy as np
  np.import_array()
  np.import_ufunc()
-
+ 
 -cdef extern from "numpy/ufuncobject.h":
 -    int PyUFunc_getfperr() nogil
 -
@@ -178,29 +178,29 @@ index 35ff34c..2e4e472 100644
 -    """
 -    return PyUFunc_getfperr()
 +
-
-
+ 
+ 
  cdef void _set_action(
 diff --git a/scipy/special/_ufuncs_extra_code_common.pxi b/scipy/special/_ufuncs_extra_code_common.pxi
 index 8e1ff08..ce867bc 100644
 --- a/scipy/special/_ufuncs_extra_code_common.pxi
 +++ b/scipy/special/_ufuncs_extra_code_common.pxi
 @@ -9,15 +9,7 @@ from numpy cimport (
-
+ 
  ctypedef double complex double_complex
-
+ 
 -cdef extern from "numpy/ufuncobject.h":
 -    int PyUFunc_getfperr() nogil
-
+ 
 -cdef public int wrap_PyUFunc_getfperr() noexcept nogil:
 -    """
 -    Call PyUFunc_getfperr in a context where PyUFunc_API array is initialized;
 -    this avoids messing with the UNIQUE_SYMBOL #defines
 -    """
 -    return PyUFunc_getfperr()
-
+ 
  cimport libc
-
+ 
 diff --git a/scipy/special/meson.build b/scipy/special/meson.build
 index eb840af..dcdad96 100644
 --- a/scipy/special/meson.build
@@ -235,7 +235,7 @@ index eb840af..dcdad96 100644
 @@ -206,22 +206,6 @@ py3.extension_module('_comb',
    subdir: 'scipy/special'
  )
-
+ 
 -py3.extension_module('_test_internal',
 -  [cython_gen.process('_test_internal.pyx'), 'dd_real_wrappers.cpp'],
 -  include_directories: ['../_lib', '../_build_utils/src'],
@@ -290,13 +290,13 @@ index caaa74f..3f13222 100644
 @@ -63,6 +63,7 @@
  namespace xsf {
  namespace cephes {
-
+ 
 +#ifdef DEFINE_chbevl
      XSF_HOST_DEVICE double chbevl(double x, const double array[], int n) {
          double b0, b1, b2;
          const double *p;
 @@ -81,5 +82,8 @@ namespace cephes {
-
+ 
          return (0.5 * (b0 - b2));
      }
 +#else
@@ -311,11 +311,11 @@ index 30ee84d..7108055 100644
 @@ -178,6 +178,7 @@ namespace cephes {
          return (igam(df / 2.0, x / 2.0));
      }
-
+ 
 +#ifdef DEFINE_chdtr
      XSF_HOST_DEVICE double chdtri(double df, double y) {
          double x;
-
+ 
 @@ -189,6 +190,9 @@ namespace cephes {
          x = igamci(0.5 * df, y);
          return (2.0 * x);
@@ -323,7 +323,7 @@ index 30ee84d..7108055 100644
 +#else
 +    XSF_HOST_DEVICE double chdtri(double df, double y);
 +#endif
-
+ 
  } // namespace cephes
  } // namespace xsf
 diff --git a/subprojects/xsf/include/xsf/cephes/hyp2f1.h b/subprojects/xsf/include/xsf/cephes/hyp2f1.h
@@ -333,13 +333,13 @@ index 819512f..2398fbc 100644
 @@ -90,6 +90,7 @@ namespace cephes {
          /* hys2f1 and hyp2f1ra depend on each other, so we need this prototype */
          XSF_HOST_DEVICE double hyp2f1ra(double a, double b, double c, double x, double *loss);
-
+ 
 +#ifdef DEFINE_hys2f1
          /* Defining power series expansion of Gauss hypergeometric function */
          /* The `loss` parameter estimates loss of significance */
          XSF_HOST_DEVICE double hys2f1(double a, double b, double c, double x, double *loss) {
 @@ -410,8 +411,15 @@ namespace cephes {
-
+ 
              return f0;
          }
 +#else
@@ -349,7 +349,7 @@ index 819512f..2398fbc 100644
 +    XSF_HOST_DEVICE double hyp2f1ra(double a, double b, double c, double x, double *loss);
 +#endif
      } // namespace detail
-
+ 
 +#ifdef DEFINE_hys2f1
      XSF_HOST_DEVICE double hyp2f1(double a, double b, double c, double x) {
          double d, d1, d2, e;
@@ -361,7 +361,7 @@ index 819512f..2398fbc 100644
 +#else
 +    XSF_HOST_DEVICE double hyp2f1(double a, double b, double c, double x);
 +#endif
-
+ 
  } // namespace cephes
  } // namespace xsf
 diff --git a/subprojects/xsf/include/xsf/cephes/igami.h b/subprojects/xsf/include/xsf/cephes/igami.h
@@ -369,9 +369,9 @@ index ff82c35..df828f9 100644
 --- a/subprojects/xsf/include/xsf/cephes/igami.h
 +++ b/subprojects/xsf/include/xsf/cephes/igami.h
 @@ -23,6 +23,7 @@ namespace cephes {
-
+ 
      namespace detail {
-
+ 
 +#ifdef DEFINE_igami
          XSF_HOST_DEVICE double find_inverse_s(double p, double q) {
              /*
@@ -383,7 +383,7 @@ index ff82c35..df828f9 100644
 +#else
 +        XSF_HOST_DEVICE double find_inverse_s(double p, double q);
 +#endif
-
+ 
          XSF_HOST_DEVICE inline double didonato_SN(double a, double x, unsigned N, double tolerance) {
              /*
 diff --git a/subprojects/xsf/include/xsf/cephes/k1.h b/subprojects/xsf/include/xsf/cephes/k1.h
@@ -393,19 +393,19 @@ index b64d0d7..fa9c935 100644
 @@ -141,6 +141,7 @@ namespace cephes {
          return (std::exp(-x) * chbevl(8.0 / x - 2.0, detail::k1_B, 25) / std::sqrt(x));
      }
-
+ 
 +#ifdef DEFINE_k1e
      XSF_HOST_DEVICE double k1e(double x) {
          double y;
-
+ 
 @@ -160,6 +161,9 @@ namespace cephes {
-
+ 
          return (chbevl(8.0 / x - 2.0, detail::k1_B, 25) / std::sqrt(x));
      }
 +#else
 +    XSF_HOST_DEVICE double k1e(double x);
 +#endif
-
+ 
  } // namespace cephes
  } // namespace xsf
 diff --git a/subprojects/xsf/include/xsf/cephes/kolmogorov.h b/subprojects/xsf/include/xsf/cephes/kolmogorov.h
@@ -415,7 +415,7 @@ index b3c4e85..c4b3739 100644
 @@ -445,6 +445,7 @@ namespace cephes {
              *Cman = man2;
          }
-
+ 
 +#ifdef DEFINE_pow2
          XSF_HOST_DEVICE double_double pow_D(const double_double &a, int m) {
              /*
@@ -427,13 +427,13 @@ index b3c4e85..c4b3739 100644
 +#else
 +        XSF_HOST_DEVICE double_double pow_D(const double_double &a, int m);
 +#endif
-
+ 
          XSF_HOST_DEVICE inline double pow2(double a, double b, int m) {
              return static_cast<double>(pow_D(double_double(a) + b, m));
 @@ -486,6 +490,7 @@ namespace cephes {
           */
          constexpr int SM_MAX_EXPONENT = 960;
-
+ 
 +#ifdef DEFINE_pow2
          XSF_HOST_DEVICE double_double pow2Scaled_D(const double_double &a, int m, int *pExponent) {
              /* Compute a^m = significand*2^expt and return as (significand, expt) */
@@ -445,7 +445,7 @@ index b3c4e85..c4b3739 100644
 +#else
 +        XSF_HOST_DEVICE double_double pow2Scaled_D(const double_double &a, int m, int *pExponent);
 +#endif
-
+ 
          XSF_HOST_DEVICE inline double_double pow4_D(double a, double b, double c, double d, int m) {
              /* Compute ((a+b)/(c+d)) ^ m */
 diff --git a/subprojects/xsf/include/xsf/cephes/lanczos.h b/subprojects/xsf/include/xsf/cephes/lanczos.h
@@ -455,10 +455,10 @@ index f387412..f529848 100644
 @@ -85,6 +85,7 @@ namespace cephes {
              -9.8907772644920670589288081640128194231,       6.565936202082889535528455955485877361223
          };
-
+ 
 +#ifdef DEFINE_lanczos
          XSF_HOST_DEVICE double lanczos_sum(double x) { return ratevl(x, lanczos_num, 12, lanczos_denom, 12); }
-
+ 
          XSF_HOST_DEVICE double lanczos_sum_near_1(double dx) {
 @@ -107,11 +108,20 @@ namespace cephes {
              }
@@ -470,7 +470,7 @@ index f387412..f529848 100644
 +        XSF_HOST_DEVICE double lanczos_sum_near_2(double dx);
 +#endif
      } // namespace detail
-
+ 
      constexpr double lanczos_g = 6.024680040776729583740234375;
 +#ifdef DEFINE_lanczos
      XSF_HOST_DEVICE double lanczos_sum_expg_scaled(double x) {
@@ -488,13 +488,13 @@ index bcc3c61..fc8bdd2 100644
 @@ -99,6 +99,7 @@ namespace cephes {
              1.0
          };
-
+ 
 +#ifdef DEFINE_psi
          XSF_HOST_DEVICE double digamma_imp_1_2(double x) {
              /*
               * Rational approximation on [1, 2] taken from Boost.
 @@ -136,8 +137,13 @@ namespace cephes {
-
+ 
              return std::log(x) - (0.5 / x) - y;
          }
 +#else
@@ -502,7 +502,7 @@ index bcc3c61..fc8bdd2 100644
 +        XSF_HOST_DEVICE double psi_asy(double x);
 +#endif
      } // namespace detail
-
+ 
 +#ifdef DEFINE_psi
      XSF_HOST_DEVICE double psi(double x) {
          double y = 0.0;
@@ -521,13 +521,13 @@ index 7c41601..845c8ec 100644
 --- a/subprojects/xsf/include/xsf/cephes/rgamma.h
 +++ b/subprojects/xsf/include/xsf/cephes/rgamma.h
 @@ -72,6 +72,7 @@ namespace cephes {
-
+ 
      } // namespace detail
-
+ 
 +#ifdef DEFINE_rgamma
      XSF_HOST_DEVICE double rgamma(double x) {
          double w, y, z;
-
+ 
 @@ -108,5 +109,8 @@ namespace cephes {
          y = w * (1.0 + chbevl(4.0 * w - 2.0, detail::rgamma_R, 16)) / z;
          return (y);
@@ -542,9 +542,9 @@ index e6235dd..28e0214 100644
 --- a/subprojects/xsf/include/xsf/expint.h
 +++ b/subprojects/xsf/include/xsf/expint.h
 @@ -164,6 +164,7 @@ XSF_HOST_DEVICE inline double expi(double x) {
-
+ 
  XSF_HOST_DEVICE inline float expi(float x) { return expi(static_cast<double>(x)); }
-
+ 
 +#ifdef DEFINE_expi
  std::complex<double> expi(std::complex<double> z) {
      // ============================================
@@ -556,7 +556,7 @@ index e6235dd..28e0214 100644
 +#else
 +std::complex<double> expi(std::complex<double> z);
 +#endif
-
+ 
  XSF_HOST_DEVICE inline std::complex<float> expi(std::complex<float> z) {
      return static_cast<std::complex<float>>(expi(static_cast<std::complex<double>>(z)));
 diff --git a/subprojects/xsf/include/xsf/faddeeva.h b/subprojects/xsf/include/xsf/faddeeva.h
@@ -566,24 +566,24 @@ index d4c67d1..946e9d6 100644
 @@ -148,6 +148,7 @@ double erfc(double x); // special case for real x
  std::complex<double> Dawson(std::complex<double> z, double relerr = 0);
  double Dawson(double x); // special case for real x
-
+ 
 +#ifdef DEFINE_faddeeva
  // compute erfcx(z) = exp(z^2) erfz(z)
  std::complex<double> erfcx(std::complex<double> z, double relerr) { return w(std::complex<double>(-imag(z), real(z))); }
-
+ 
 @@ -431,6 +432,8 @@ taylor_realaxis: {
  }
  }
-
+ 
 +#endif
 +
  // return sinc(x) = sin(x)/x, given both x and sin(x)
  // [since we only use this in cases where sin(x) has already been computed]
  inline double sinc(double x, double sinx) { return fabs(x) < 1e-4 ? 1 - (0.1666666666666666666667) * x * x : sinx / x; }
 @@ -503,6 +506,7 @@ static const double expa2n2[] = {
-
+ 
  /////////////////////////////////////////////////////////////////////////
-
+ 
 +#ifdef DEFINE_faddeeva
  std::complex<double> w(std::complex<double> z, double relerr) {
      if (real(z) == 0.0)
@@ -593,7 +593,7 @@ index d4c67d1..946e9d6 100644
      }
  }
 +#endif
-
+ 
  } // namespace Faddeeva
 diff --git a/subprojects/xsf/include/xsf/hyp2f1.h b/subprojects/xsf/include/xsf/hyp2f1.h
 index bdecebf..a80c854 100644
@@ -602,7 +602,7 @@ index bdecebf..a80c854 100644
 @@ -458,6 +458,7 @@ namespace detail {
          std::complex<double> z_, Z_;
      };
-
+ 
 +#ifdef DEFINE_xsf_hyp2f1
      XSF_HOST_DEVICE std::complex<double>
      hyp2f1_transform1_limiting_case(double a, double b, double c, double m, std::complex<double> z) {
@@ -617,9 +617,9 @@ index bdecebf..a80c854 100644
 +    XSF_HOST_DEVICE std::complex<double> hyp2f1_transform2_limiting_case(double a, double b, double c, double m,
 +                                                                             std::complex<double> z);
 +#endif
-
+ 
  } // namespace detail
-
+ 
 diff --git a/subprojects/xsf/include/xsf/loggamma.h b/subprojects/xsf/include/xsf/loggamma.h
 index 2394a65..1fcadbc 100644
 --- a/subprojects/xsf/include/xsf/loggamma.h
@@ -627,7 +627,7 @@ index 2394a65..1fcadbc 100644
 @@ -38,6 +38,7 @@ namespace detail {
      constexpr double loggamma_LOGPI = 1.1447298858494001741434262; // log(pi)
      constexpr double loggamma_TAYLOR_RADIUS = 0.2;
-
+ 
 +#ifdef DEFINE_loggamma
      XSF_HOST_DEVICE std::complex<double> loggamma_stirling(std::complex<double> z) {
          /* Stirling series for log-Gamma
@@ -642,7 +642,7 @@ index 2394a65..1fcadbc 100644
 +    XSF_HOST_DEVICE std::complex<double> loggamma_taylor(std::complex<double> z);
 +#endif
  } // namespace detail
-
+ 
  XSF_HOST_DEVICE inline double loggamma(double x) {
 diff --git a/subprojects/xsf/include/xsf/numbers.h b/subprojects/xsf/include/xsf/numbers.h
 index da4e241..64971cb 100644
@@ -651,11 +651,11 @@ index da4e241..64971cb 100644
 @@ -8,11 +8,18 @@ namespace numbers {
      template <typename T>
      std::complex<T> i_v;
-
+ 
 +#ifdef DEFINE_numbers
      template <>
      std::complex<float> i_v<float> = std::literals::complex_literals::operator""if(1.0L);
-
+ 
      template <>
      std::complex<double> i_v<double> = std::literals::complex_literals::operator""i(1.0L);
 +#else
@@ -664,7 +664,7 @@ index da4e241..64971cb 100644
 +    extern template
 +    std::complex<double> i_v<double>;
 +#endif
-
+ 
  } // namespace numbers
  } // namespace xsf
 diff --git a/subprojects/xsf/include/xsf/numpy.h b/subprojects/xsf/include/xsf/numpy.h
@@ -677,10 +677,10 @@ index e1153ee..c494476 100644
   * Define a wrapper so it can be given C linkage within this C++ header. */
 -extern "C" int wrap_PyUFunc_getfperr() { return PyUFunc_getfperr(); }
 +extern "C" int wrap_PyUFunc_getfperr(); // { return PyUFunc_getfperr(); }
-
+ 
  namespace xsf {
  namespace numpy {
-
+ 
 +#ifdef DEFINE_xsf_numpy
      void set_error_check_fpe(const char *func_name) {
          int status = wrap_PyUFunc_getfperr();
@@ -692,19 +692,19 @@ index e1153ee..c494476 100644
 +#else
 +    void set_error_check_fpe(const char *func_name);
 +#endif
-
+ 
      namespace detail {
-
+ 
 @@ -965,6 +969,7 @@ namespace numpy {
          }
      };
-
+ 
 +#ifdef DEFINE_xsf_ufunc
      PyObject *ufunc(ufunc_overloads func, int nout, const char *name, const char *doc) {
          static std::vector<ufunc_overloads> ufuncs;
-
+ 
 @@ -1015,6 +1020,17 @@ namespace numpy {
-
+ 
          return gufunc(std::move(overloads), nout, name, doc, signature, map_dims);
      }
 +#else
@@ -718,7 +718,7 @@ index e1153ee..c494476 100644
 +        ufunc_overloads overloads, const char *name, const char *doc, const char *signature, map_dims_type map_dims
 +    );
 +#endif
-
+ 
      // rename to autodiff_var?
      template <typename T>
 diff --git a/subprojects/xsf/include/xsf/struve.h b/subprojects/xsf/include/xsf/struve.h
@@ -728,14 +728,14 @@ index d9541aa..202ed1c 100644
 @@ -217,6 +217,7 @@ T itmodstruve0(T x) {
      return out;
  }
-
+ 
 +#ifdef DEFINE_struve
  double struve_h(double v, double z) { return cephes::struve_h(v, z); }
-
+ 
  float struve_h(float v, float z) { return struve_h(static_cast<double>(v), static_cast<double>(z)); }
 @@ -224,5 +225,11 @@ float struve_h(float v, float z) { return struve_h(static_cast<double>(v), stati
  double struve_l(double v, double z) { return cephes::struve_l(v, z); }
-
+ 
  float struve_l(float v, float z) { return struve_l(static_cast<double>(v), static_cast<double>(z)); }
 +#else
 +double struve_h(double v, double z);
@@ -743,5 +743,5 @@ index d9541aa..202ed1c 100644
 +double struve_l(double v, double z);
 +float struve_l(float v, float z);
 +#endif
-
+ 
  } // namespace xsf
