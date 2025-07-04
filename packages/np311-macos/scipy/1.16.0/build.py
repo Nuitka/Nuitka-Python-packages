@@ -50,6 +50,7 @@ def run(wheel_directory):
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/fft/_pocketfft/pypocketfft.nuitkapython-311-darwin.a"), "scipy_fft__pocketfft_pypocketfft_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/optimize/_pava_pybind.nuitkapython-311-darwin.a"), "scipy_stats_optimize__pava_pybind_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/spatial/_distance_pybind.nuitkapython-311-darwin.a"), "scipy_stats_spatial__distance_pybind_")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/spatial/_qhull.nuitkapython-311-darwin.a"), "scipy_stats_spatial__qhull_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/optimize/_highspy/_highs_options.nuitkapython-311-darwin.a"), "scipy__highspy__highs_options_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/sparse/linalg/_propack/_cpropack.nuitkapython-311-darwin.a"), "scipy_sparse_linalg__propack__cpropack_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/sparse/linalg/_propack/_dpropack.nuitkapython-311-darwin.a"), "scipy_sparse_linalg__propack__dpropack_")
