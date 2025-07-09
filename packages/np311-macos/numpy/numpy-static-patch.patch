@@ -1,5 +1,5 @@
 diff --git a/meson.build b/meson.build
-index 0d43635..f365f7c 100644
+index d816cca..2878318 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -13,6 +13,8 @@ project(
@@ -12,10 +12,10 @@ index 0d43635..f365f7c 100644
  )
  
 diff --git a/numpy/_core/meson.build b/numpy/_core/meson.build
-index cd46a20..50f6c2e 100644
+index 6b6fbd3..1b97b16 100644
 --- a/numpy/_core/meson.build
 +++ b/numpy/_core/meson.build
-@@ -783,29 +783,6 @@ _umath_tests_mtargets = mod_features.multi_targets(
+@@ -740,29 +740,6 @@ _umath_tests_mtargets = mod_features.multi_targets(
    dependencies: [py_dep, np_core_dep]
  )
  
@@ -66,7 +66,7 @@ index a5ca280..e33e5d1 100644
  #endif
  
 diff --git a/numpy/distutils/command/build_ext.py b/numpy/distutils/command/build_ext.py
-index 42137e5..b312160 100644
+index 5c62d90..4e243f9 100644
 --- a/numpy/distutils/command/build_ext.py
 +++ b/numpy/distutils/command/build_ext.py
 @@ -617,15 +617,36 @@ def build_extension(self, ext):
@@ -154,7 +154,7 @@ index e2f8136..bcdb975 100644
  py.extension_module('lapack_lite',
    [
 diff --git a/vendored-meson/meson/mesonbuild/backend/ninjabackend.py b/vendored-meson/meson/mesonbuild/backend/ninjabackend.py
-index b78ad07..1446f66 100644
+index 9c69328..03a01dd 100644
 --- a/vendored-meson/meson/mesonbuild/backend/ninjabackend.py
 +++ b/vendored-meson/meson/mesonbuild/backend/ninjabackend.py
 @@ -13,6 +13,7 @@
@@ -165,7 +165,7 @@ index b78ad07..1446f66 100644
  import pickle
  import re
  import subprocess
-@@ -1081,6 +1082,25 @@ def generate_target(self, target) -> None:
+@@ -1072,6 +1073,25 @@ def generate_target(self, target):
          elem = self.generate_link(target, outname, final_obj_list, linker, pch_objects, stdlib_args=stdlib_args)
          self.generate_dependency_scan_target(target, compiled_sources, source2object, generated_source_files, fortran_order_deps)
          self.add_build(elem)
@@ -191,7 +191,7 @@ index b78ad07..1446f66 100644
          #In AIX, we archive shared libraries. If the instance is a shared library, we add a command to archive the shared library
          #object and create the build element.
          if isinstance(target, build.SharedLibrary) and self.environment.machines[target.for_machine].is_aix():
-@@ -1352,6 +1372,11 @@ def generate_rules(self) -> None:
+@@ -1342,6 +1362,11 @@ def generate_rules(self):
          self.add_rule_comment(NinjaComment('Rules for linking.'))
          self.generate_static_link_rules()
          self.generate_dynamic_link_rules()
@@ -203,8 +203,8 @@ index b78ad07..1446f66 100644
          self.add_rule_comment(NinjaComment('Other rules'))
          # Ninja errors out if you have deps = gcc but no depfile, so we must
          # have two rules for custom commands.
-@@ -3719,6 +3744,8 @@ def generate_ending(self) -> None:
-                         linker, stdlib_args = t.get_clink_dynamic_linker_and_stdlibs()
+@@ -3710,6 +3735,8 @@ def generate_ending(self) -> None:
+                         linker, stdlib_args = self.determine_linker_and_stdlib_args(t)
                          t.get_outputs()[0] = linker.get_archive_name(t.get_outputs()[0])
                  targetlist.append(os.path.join(self.get_target_dir(t), t.get_outputs()[0]))
 +                if isinstance(t, build.StaticLibrary):
@@ -213,10 +213,10 @@ index b78ad07..1446f66 100644
              elem = NinjaBuildElement(self.all_outputs, targ, 'phony', targetlist)
              self.add_build(elem)
 diff --git a/vendored-meson/meson/mesonbuild/build.py b/vendored-meson/meson/mesonbuild/build.py
-index f5be34d..2bfa7de 100644
+index 02d2bb9..5cf0c98 100644
 --- a/vendored-meson/meson/mesonbuild/build.py
 +++ b/vendored-meson/meson/mesonbuild/build.py
-@@ -1463,12 +1463,11 @@ def get_internal_static_libraries(self) -> OrderedSet[BuildTargetTypes]:
+@@ -1448,12 +1448,11 @@ def get_internal_static_libraries(self) -> OrderedSet[BuildTargetTypes]:
      def get_internal_static_libraries_recurse(self, result: OrderedSet[BuildTargetTypes]) -> None:
          for t in self.link_targets:
              if t.is_internal() and t not in result:
@@ -231,7 +231,7 @@ index f5be34d..2bfa7de 100644
  
      def check_can_extract_objects(self, t: T.Union[Target, CustomTargetIndex], origin: StaticLibrary, promoted: bool = False) -> None:
          if isinstance(t, (CustomTarget, CustomTargetIndex)) or t.uses_rust():
-@@ -2188,7 +2187,10 @@ def post_init(self) -> None:
+@@ -2146,7 +2145,10 @@ def post_init(self) -> None:
                  elif self.rust_crate_type == 'staticlib':
                      self.suffix = 'a'
              else:
@@ -243,7 +243,7 @@ index f5be34d..2bfa7de 100644
          self.filename = self.prefix + self.name + '.' + self.suffix
          self.outputs[0] = self.filename
  
-@@ -2252,6 +2254,8 @@ def __init__(
+@@ -2202,6 +2204,8 @@ def __init__(
              environment: environment.Environment,
              compilers: T.Dict[str, 'Compiler'],
              kwargs):
@@ -253,7 +253,7 @@ index f5be34d..2bfa7de 100644
          self.ltversion: T.Optional[str] = None
          # Max length 2, first element is compatibility_version, second is current_version
 diff --git a/vendored-meson/meson/mesonbuild/cmake/toolchain.py b/vendored-meson/meson/mesonbuild/cmake/toolchain.py
-index 9eb961c..ffa9f89 100644
+index 89d5d84..6f6c1be 100644
 --- a/vendored-meson/meson/mesonbuild/cmake/toolchain.py
 +++ b/vendored-meson/meson/mesonbuild/cmake/toolchain.py
 @@ -174,6 +174,8 @@ def make_abs(exe: str) -> str:
@@ -265,20 +265,20 @@ index 9eb961c..ffa9f89 100644
              prefix = 'CMAKE_{}_'.format(language_map.get(lang, lang.upper()))
  
              exe_list = comp_obj.get_exelist()
-@@ -210,7 +212,7 @@ def update_cmake_compiler_state(self) -> None:
+@@ -208,7 +210,7 @@ def update_cmake_compiler_state(self) -> None:
          # Generate the CMakeLists.txt
          mlog.debug('CMake Toolchain: Calling CMake once to generate the compiler state')
          languages = list(self.compilers.keys())
 -        lang_ids = [language_map.get(x, x.upper()) for x in languages]
 +        lang_ids = [language_map.get(x, x.upper()) for x in languages if x != 'cython']
          cmake_content = dedent(f'''
-             cmake_minimum_required(VERSION 3.10)
+             cmake_minimum_required(VERSION 3.7)
              project(CompInfo {' '.join(lang_ids)})
 diff --git a/vendored-meson/meson/mesonbuild/dependencies/python.py b/vendored-meson/meson/mesonbuild/dependencies/python.py
-index 0ca9cef..ab04389 100644
+index 46d12f3..5e377cd 100644
 --- a/vendored-meson/meson/mesonbuild/dependencies/python.py
 +++ b/vendored-meson/meson/mesonbuild/dependencies/python.py
-@@ -223,7 +223,7 @@ def get_windows_link_args(self, limited_api: bool) -> T.Optional[T.List[str]]:
+@@ -222,7 +222,7 @@ def get_windows_link_args(self, limited_api: bool) -> T.Optional[T.List[str]]:
              verdot = self.variables.get('py_version_short')
              imp_lower = self.variables.get('implementation_lower', 'python')
              if self.static:
@@ -287,8 +287,22 @@ index 0ca9cef..ab04389 100644
              else:
                  if limited_api:
                      vernum = vernum[0]
+diff --git a/vendored-meson/meson/mesonbuild/interpreter/interpreter.py b/vendored-meson/meson/mesonbuild/interpreter/interpreter.py
+index 0711bbf..d93cff5 100644
+--- a/vendored-meson/meson/mesonbuild/interpreter/interpreter.py
++++ b/vendored-meson/meson/mesonbuild/interpreter/interpreter.py
+@@ -1850,6 +1850,9 @@ def func_executable(self, node: mparser.BaseNode,
+     def func_static_lib(self, node: mparser.BaseNode,
+                         args: T.Tuple[str, SourcesVarargsType],
+                         kwargs: kwtypes.StaticLibrary) -> build.StaticLibrary:
++        import sys
++        kwargs['install'] = True
++        kwargs["install_dir"] = self._holderify(self.modules['python'].installations[sys.executable])._get_install_dir_impl(False, self.active_projectname.lower())
+         return self.build_target(node, args, kwargs, build.StaticLibrary)
+ 
+     @permittedKwargs(build.known_shlib_kwargs)
 diff --git a/vendored-meson/meson/mesonbuild/modules/python.py b/vendored-meson/meson/mesonbuild/modules/python.py
-index f828f0e..fc842ae 100644
+index 30fc50b..7d2189b 100644
 --- a/vendored-meson/meson/mesonbuild/modules/python.py
 +++ b/vendored-meson/meson/mesonbuild/modules/python.py
 @@ -10,7 +10,7 @@
@@ -300,7 +314,7 @@ index f828f0e..fc842ae 100644
  from ..dependencies import NotFoundDependency
  from ..dependencies.detect import get_dep_identifier, find_external_dependency
  from ..dependencies.python import BasicPythonExternalProgram, python_factory, _PythonDependencyBase
-@@ -230,7 +230,7 @@ def extension_module_method(self, args: T.Tuple[str, T.List[BuildTargetSource]],
+@@ -229,7 +229,7 @@ def extension_module_method(self, args: T.Tuple[str, T.List[BuildTargetSource]],
                  (self.is_pypy or mesonlib.version_compare(self.version, '>=3.9')):
              kwargs['gnu_symbol_visibility'] = 'inlineshidden'
  
@@ -310,11 +324,11 @@ index f828f0e..fc842ae 100644
      def _convert_api_version_to_py_version_hex(self, api_version: str, detected_version: str) -> str:
          python_api_version_format = re.compile(r'[0-9]\.[0-9]{1,2}')
 diff --git a/vendored-meson/meson/mesonbuild/modules/python3.py b/vendored-meson/meson/mesonbuild/modules/python3.py
-index 2e6779a..20068d6 100644
+index 45ad850..11ebcf0 100644
 --- a/vendored-meson/meson/mesonbuild/modules/python3.py
 +++ b/vendored-meson/meson/mesonbuild/modules/python3.py
 @@ -10,7 +10,7 @@
- from . import ExtensionModule, ModuleInfo
+ from . import ExtensionModule, ModuleInfo, ModuleState
  from ..build import (
      BuildTarget, CustomTarget, CustomTargetIndex, ExtractedObjects,
 -    GeneratedList, SharedModule, StructuredSources, known_shmod_kwargs
@@ -322,7 +336,7 @@ index 2e6779a..20068d6 100644
  )
  from ..interpreter.type_checking import SHARED_MOD_KWS
  from ..interpreterbase import typed_kwargs, typed_pos_args, noPosargs, noKwargs, permittedKwargs
-@@ -53,7 +53,7 @@ def extension_module(self, state: ModuleState, args: T.Tuple[str, T.List[BuildTa
+@@ -52,7 +52,7 @@ def extension_module(self, state: ModuleState, args: T.Tuple[str, T.List[BuildTa
              suffix = []
          kwargs['name_prefix'] = ''
          kwargs['name_suffix'] = suffix
