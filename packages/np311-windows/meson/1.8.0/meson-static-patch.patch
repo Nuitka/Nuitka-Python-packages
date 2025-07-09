@@ -117,6 +117,20 @@ index ab040b5..83c0593 100644
              else:
                  if limited_api:
                      vernum = vernum[0]
+diff --git a/mesonbuild/interpreter/interpreter.py b/mesonbuild/interpreter/interpreter.py
+index 8fb660d..8f2cca6 100644
+--- a/mesonbuild/interpreter/interpreter.py
++++ b/mesonbuild/interpreter/interpreter.py
+@@ -1855,6 +1855,9 @@ class Interpreter(InterpreterBase, HoldableObject):
+     def func_static_lib(self, node: mparser.BaseNode,
+                         args: T.Tuple[str, SourcesVarargsType],
+                         kwargs: kwtypes.StaticLibrary) -> build.StaticLibrary:
++        import sys
++        kwargs['install'] = True
++        kwargs["install_dir"] = self._holderify(self.modules['python'].installations[sys.executable])._get_install_dir_impl(False, self.active_projectname.lower())
+         return self.build_target(node, args, kwargs, build.StaticLibrary)
+ 
+     @permittedKwargs(build.known_shlib_kwargs)
 diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
 index 2a7e685..eaa7507 100644
 --- a/mesonbuild/modules/python.py
