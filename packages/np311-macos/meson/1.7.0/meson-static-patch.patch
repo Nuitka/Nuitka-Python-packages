@@ -127,7 +127,7 @@ index 3b2d017..ac3205f 100644
                          kwargs: kwtypes.StaticLibrary) -> build.StaticLibrary:
 +        import sys
 +        kwargs['install'] = True
-+        kwargs["install_dir"] = self._holderify(self.modules['python'].installations[sys.executable])._get_install_dir_impl(False, self.active_projectname.lower())
++        kwargs["install_dir"] = kwargs.get("install_dir", self._holderify(self.modules['python'].installations[sys.executable])._get_install_dir_impl(False, self.active_projectname.lower()))
          return self.build_target(node, args, kwargs, build.StaticLibrary)
 
      @permittedKwargs(build.known_shlib_kwargs)
