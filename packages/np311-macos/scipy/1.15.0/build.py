@@ -58,6 +58,12 @@ def run(wheel_directory):
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/sparse/linalg/_propack/_dpropack.nuitkapython-311-darwin.a"), "scipy_sparse_linalg__propack__dpropack_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/sparse/linalg/_propack/_spropack.nuitkapython-311-darwin.a"), "scipy_sparse_linalg__propack__spropack_")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/sparse/linalg/_propack/_zpropack.nuitkapython-311-darwin.a"), "scipy_sparse_linalg__propack__zpropack_")
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/liblib__cpropack.a"), "scipy_lib__cpropack_", [".*clansvd.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/liblib__spropack.a"), "scipy_lib__spropack_", [".*slansvd.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/liblib__dpropack.a"), "scipy_lib__dpropack_", [".*dlansvd.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/liblib__zpropack.a"), "scipy_lib__zpropack_", [".*zlansvd.*"])
+        __np__.rename_symbols_in_file(os.path.join(tmpdir, "scipy/libodrpack.a"), "scipy_libodrpack_", [".*dlunc.*", ".*dluno.*", ".*dodrc.*", ".*dwinf.*", ])
+
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)
