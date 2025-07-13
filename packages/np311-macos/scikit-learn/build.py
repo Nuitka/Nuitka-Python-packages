@@ -10,6 +10,9 @@ from wheel.wheelfile import WheelFile
 
 
 def run(wheel_directory):
+    __np__.run_build_tool_exe("patch", "-p1", "-ui",
+                              os.path.join(os.path.dirname(__file__), "scikit_learn-static-patch.patch"))
+
     env = os.environ.copy()
     env["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
     env["PEP517_BACKEND_PATH"] = os.pathsep.join([x for x in sys.path if not x.endswith(os.path.sep + "site")])
@@ -30,7 +33,6 @@ def run(wheel_directory):
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn/svm/_libsvm.nuitkapython-311-darwin.a"), "sklearn_svm__libsvm")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn/svm/_newrand.nuitkapython-311-darwin.a"), "sklearn_svm__newrand")
         __np__.rename_symbols_in_file(os.path.join(tmpdir, "sklearn/svm/_liblinear.nuitkapython-311-darwin.a"), "sklearn_svm__liblinear")
-        __np__.remove_symbols_in_file(os.path.join(tmpdir, "scikit-learn/libliblinear-skl.a"), "src_liblinear_linear.cpp.o", ["_set_seed", "set_seed", "_mt_rand", "mt_rand"])
         with WheelFile(wheel_location, 'w') as wf:
             for filename in wheel_files:
                 wf.write(os.path.join(tmpdir, filename), filename)
