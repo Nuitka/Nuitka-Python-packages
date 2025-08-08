@@ -4,14 +4,17 @@
       "metadata": {
         "Version": "*"
       },
-      "build_tools": [],
+      "build_tools": [
+        "patch"
+      ],
       "dependencies": [],
       "files": [
         "build.py",
-        "pyproject_hooks-static-patch.patch"
+        "jedi-static-patch.patch"
       ],
       "build_requires": [
-        "setuptools"
+        "setuptools",
+        "build"
       ],
       "build_script": "build.py"
     }

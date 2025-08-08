@@ -16,6 +16,8 @@ def run(wheel_directory):
     __np__.run_build_tool_exe("patch", "patch.exe", "-p1", "-i",
                               os.path.join(os.path.dirname(__file__), "numpy-static-patch.patch"))
 
+    __np__.patch_all_source(build_dir)
+
     __np__.filter_paths_containing("gfortran.exe")
     env = os.environ.copy()
     job_args = []
